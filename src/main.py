@@ -83,6 +83,18 @@ class AdministrationHandler(webapp.RequestHandler):
         }
         self.response.out.write(template.render(path, template_values))
 
+class EventHandler(webapp.RequestHandler):
+    def get(self):
+        events = Event.all()
+        days = []
+        for event in events:
+            days.extend(Day.gql("WHERE event = :1", event))
+        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
+        template_values = {
+            'events': events,
+            'days': days         
+        }
+        self.response.out.write(template.render(path, template_values))
 
 class FillDatabaseHandler(webapp.RequestHandler):
     def get(self):
@@ -123,13 +135,39 @@ class FillDatabaseHandler(webapp.RequestHandler):
                       talks=12,
                       event=new_event)
         new_day.put()
+        
+        # Add an event
+        new_event = Event(event_id=2,
+                          tables=40,
+                          talk_time=15)
+        new_event.put()
+
+        # Add some days to the aforementioned event
+        new_day = Day(day_id=4,
+                      date=datetime.datetime(year=2011, month=11, day=20, hour=19, minute=30),
+                      talks=12,
+                      event=new_event)
+        new_day.put()
+
+        new_day = Day(day_id=5,
+                      date=datetime.datetime(year=2011, month=11, day=21, hour=20, minute=00),
+                      talks=12,
+                      event=new_event)
+        new_day.put()
+
+        new_day = Day(day_id=6,
+                      date=datetime.datetime(year=2011, month=11, day=22, hour=19, minute=45),
+                      talks=12,
+                      event=new_event)
+        new_day.put()
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
                                           ('/inschrijven', RegisterHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
-                                          ('/administratie', AdministrationHandler)                                          
+                                          ('/administratie', AdministrationHandler),
+                                          ('/events', EventHandler)                                          
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

@@ -2,30 +2,110 @@
 
 {% block content %}
 
-	<div id="new_event" style="width: 100%; height: 50px; border: 1px solid #000000; font-size: 20; font-weight: bold"><a id="new_event_button" href="" style="display:block; width: 100%; height: 100%">Nieuwe ouderavond</a></div>
+	<style type="text/css">
+	th
+	{
+		text-align: left;
+	}
+	
+	div#new_event
+	{
+		width: 960px; 
+		height: 50px; 
+		border: 1px solid #000000; 
+		font-size: 28; 
+		font-weight: bold;
+	}
+	
+	a#new_event_button
+	{
+		text-align: center;
+		margin-top: 8px;
+		color: #000000;
+		text-decoration: none;
+		display:block;
+		width: 100%; 
+		height: 100%;
+	}
+	
+	ul#events
+	{
+		margin: 0;
+		margin-top: 20px;
+		padding: 0;
+		list-style-type: none;
+	}
+	
+	ul#events li
+	{
+		width: 960px;
+		border-width: 1px 1px 0 1px;
+		border-style: solid;
+		border-color: #000000;
+	}
+
+	ul#events li:last-child
+	{
+		width: 960px;
+		border-width: 1px 1px 1px 1px;
+		border-style: solid;
+		border-color: #000000;
+	}
+
+	
+	.clearFix:after
+	{
+		clear: both;
+		display: block;
+		height: 0;
+		content: ".";
+		visibility: hidden;
+	}
+	
+	.clearFix div
+	{
+		padding-left: 15px;
+		padding-right: 15px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		position: relative; 
+		float: left; 
+		width: 290px;
+	}
+	
+	.clearFix div.event_title
+	{
+		clear: both;
+	}
+	</style>
+
+	<div id="new_event"><a id="new_event_button" href="#">Nieuwe ouderavond</a></div>
 	
 	<div id="existing_events">
 	<!--
 		Te generen uit de database, voorbeeld hardcoded.
 	-->
-		<ul style="list-style-type: none;">
-			<li style="border: 1px solid #000000;">
-				<div id="event_title" style="position: relative; float: left; width: 33%">
-					<b>Ouderavonden Paasrapport</b>
+		<ul id="events">
+			{% for event in events %}
+			<li class="clearFix">
+				<div class="event_title">
+					<b>{{event.event_name}}</b>
 				</div>
-				<div id="event_dates" style="position: relative; float: left; width: 33%">
+				<div class="event_dates">
 					<table>
 						<tr>
 							<th>Data</th>
 						</tr>
+						{% for day in days %}
+						{% ifequal day.event.event_id event.event_id %}
 						<tr>
-							<td>23 september 2011</td><td>19:00 - 22:00</td>
-							<td>24 september 2011</td><td>19:00 - 21:30</td>
-							<td>25 september 2011</td><td>19:30 - 21:00</td>
+							<td>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - 22:00</td>
 						</tr>
+						{% endifequal %}
+						{% endfor %}
 					</table>
 				</div>
-				<div id="event_status" style="position: relative; float: left; width: 33%">
+				<div class="event_status">
 					<b>Status</b><br />
 					Uitnodigingen zijn nog niet verzonden
 					<form action="" method="post">
@@ -33,48 +113,7 @@
 					</form>
 				</div>
 			</li>
-			<li style="border: 1px solid #000000;">
-				<div id="event_title" style="position: relative; float: left; width: 33%">
-					<b>Ouderavonden Kerstrapport</b>
-				</div>
-				<div id="event_dates" style="position: relative; float: left; width: 33%">
-					<table>
-						<tr>
-							<th>Data</th>
-						</tr>
-						<tr>
-							<td>23 september 2011</td><td>19:00 - 22:00</td>
-							<td>24 september 2011</td><td>19:00 - 21:30</td>
-							<td>25 september 2011</td><td>19:30 - 21:00</td>
-						</tr>
-					</table>
-				</div>
-				<div id="event_status" style="position: relative; float: left; width: 33%">
-					<b>Status</b><br />
-					Inschrijving is geopend.
-				</div>
-			</li>
-			<li style="border: 1px solid #000000;">
-				<div id="event_title" style="position: relative; float: left; width: 33%">
-					<b>Ouderavonden Herfstrapport</b>
-				</div>
-				<div id="event_dates" style="position: relative; float: left; width: 33%">
-					<table>
-						<tr>
-							<th>Data</th>
-						</tr>
-						<tr>
-							<td>23 september 2011</td><td>19:00 - 22:00</td>
-							<td>24 september 2011</td><td>19:00 - 21:30</td>
-							<td>25 september 2011</td><td>19:30 - 21:00</td>
-						</tr>
-					</table>
-				</div>
-				<div id="event_status" style="position: relative; float: left; width: 33%">
-					<b>Status</b><br />
-					Ouderavond heeft plaatsgevonden
-				</div>
-			</li>
+			{% endfor %}
 		</ul>
 	</div>
 
