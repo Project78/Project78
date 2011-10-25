@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Inschrijven</title>
+</head>
+
+<body>
+<h1>Inschrijven voor Event nummer {{event.event_id}}</h1>
+<p>Dit formulier is bedoeld voor Guardian nummer {{guardian.guardian_id}}</p>
+<form method="post">
+    {% for day in days %}
+	<label for="day_id">{{day.date}}</label>
+	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank1" value="1" />1 
+	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank2" value="2" />2 
+	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank3" value="3" />3<br>
+	<br>
+    {% endfor %}
+    <input type="hidden" name="guardian_id" value="{{guardian.guardian_id}}" />
+	<input type="submit" id="submit" value="Schrijf in" />
+</form>
+</body>
+
+</html>
