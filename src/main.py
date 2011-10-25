@@ -166,7 +166,7 @@ def main():
                                           ('/inschrijven', RegisterHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
-                                          ('/administratie', AdministrationHandler),
+                                          ('/administratie/nieuw-event', AdministrationHandler),
                                           ('/events', EventHandler)                                          
                                           ],
                                          debug=True)

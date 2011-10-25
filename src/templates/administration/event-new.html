@@ -1,5 +1,75 @@
 {% extends "event-base.html" %}
 
 {% block content %}
-Hier komt een tekst voor een nieuw event
+<div id="content">
+	<a href="/administratie">Terug naar het overzicht</a>
+	<form id="event-form" method="post" action="">
+		
+		<!-- Main information -->
+		<h1>Nieuwe ouderavondreeks</h1>
+		<h2>Algemene informatie</h1>
+		<div class="label-pair clearfix">
+			<label>Titel ouderavond reeks</label>
+			<input type="text" name="event-title" value="" />
+		</div>
+		<div class="label-pair clearfix">
+			<label>Versturen van elektronische uitnodigingen</label>
+			<input type="text" name="event-mail-date" value="" />
+		</div>
+		
+		<!-- Subscription period -->
+		<h2>Inschrijfperiode</h2>
+		<div class="label-pair clearfix">
+			<label>Opening inschrijfperiode</label>
+			<input type="text" name="event-subscr-open" value="" />
+		</div>
+		<div class="label-pair clearfix">
+			<label>Sluiting inschrijfperiode</label>
+			<input type="text" name="event-subscr-close" value="" />
+		</div>
+		
+		<!-- Dates -->
+		<div id="event-form-dates" class="clearfix">	
+			<h2>Data</h2>
+			<div id="event-form-date-list">
+				<ul>
+					<li><a href="#" class="event-form-date-active">1 september, Maandag </a></li>
+					<li><a href="#">2 september, Dinsdag </a></li>
+					<li><a href="#">3 september, Woensdag </a></li>
+					<li><a href="#" class="event-form-date-last">Voeg nog een datum toe</a></li>
+				</ul>
+			</div>
+			
+			<div id="event-form-date-properties">
+			
+				<div class="label-pair">	
+					<label>Datum</label>
+					<input type="text" name="event-date" value="" />
+				</div>
+				
+				<div class="label-pair">
+					<label>Begintijd</label>
+					<input type="text" name="event-date" value="" />
+				</div>
+				
+				<div class="label-pair">
+					<label>Aantal slots</label>
+					<input type="text" name="event-subscr-close" value="" />
+				</div>
+				
+				<div class="label-pair">
+					<label>Lengte slots</label>
+					<input type="text" name="event-subscr-close" value="" />
+				</div>			
+				
+				<div class="label-pair">
+					<label>Aantal tafels</label>
+					<input type="text" name="event-subscr-close" value="" />
+				</div>
+				<input type="submit" value="Verwijder datum" />
+			</div>
+			
+		</div>
+	</form>
+</div>
 {% endblock %}
