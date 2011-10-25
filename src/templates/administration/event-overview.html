@@ -2,7 +2,7 @@
 
 {% block content %}
 
-	<div id="new_event" style="border: 1px solid #000000; font-size: 20; font-weight: bold"><a id="new_event_button" href="" style="display:block; width: 100%; height: 100%">Nieuwe ouderavond</a></div>
+	<div id="new_event" style="width: 100%; height: 50px; border: 1px solid #000000; font-size: 20; font-weight: bold"><a id="new_event_button" href="" style="display:block; width: 100%; height: 100%">Nieuwe ouderavond</a></div>
 	
 	<div id="existing_events">
 	<!--
@@ -10,10 +10,10 @@
 	-->
 		<ul style="list-style-type: none;">
 			<li style="border: 1px solid #000000;">
-				<div id="event_title">
+				<div id="event_title" style="position: relative; float: left; width: 33%">
 					<b>Ouderavonden Paasrapport</b>
 				</div>
-				<div id="event_dates">
+				<div id="event_dates" style="position: relative; float: left; width: 33%">
 					<table>
 						<tr>
 							<th>Data</th>
@@ -25,7 +25,7 @@
 						</tr>
 					</table>
 				</div>
-				<div id="event_status">
+				<div id="event_status" style="position: relative; float: left; width: 33%">
 					<b>Status</b><br />
 					Uitnodigingen zijn nog niet verzonden
 					<form action="" method="post">
@@ -33,11 +33,11 @@
 					</form>
 				</div>
 			</li>
-			<li>
-				<div id="event_title">
+			<li style="border: 1px solid #000000;">
+				<div id="event_title" style="position: relative; float: left; width: 33%">
 					<b>Ouderavonden Kerstrapport</b>
 				</div>
-				<div id="event_dates">
+				<div id="event_dates" style="position: relative; float: left; width: 33%">
 					<table>
 						<tr>
 							<th>Data</th>
@@ -49,16 +49,16 @@
 						</tr>
 					</table>
 				</div>
-				<div id="event_status">
+				<div id="event_status" style="position: relative; float: left; width: 33%">
 					<b>Status</b><br />
 					Inschrijving is geopend.
 				</div>
 			</li>
-			<li>
-				<div id="event_title">
+			<li style="border: 1px solid #000000;">
+				<div id="event_title" style="position: relative; float: left; width: 33%">
 					<b>Ouderavonden Herfstrapport</b>
 				</div>
-				<div id="event_dates">
+				<div id="event_dates" style="position: relative; float: left; width: 33%">
 					<table>
 						<tr>
 							<th>Data</th>
@@ -70,7 +70,7 @@
 						</tr>
 					</table>
 				</div>
-				<div id="event_status">
+				<div id="event_status" style="position: relative; float: left; width: 33%">
 					<b>Status</b><br />
 					Ouderavond heeft plaatsgevonden
 				</div>
