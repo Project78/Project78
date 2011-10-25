@@ -1,0 +1,81 @@
+{% extends "event-base.html" %}
+
+{% block content %}
+
+	<div id="new_event" style="border: 1px solid #000000; font-size: 20; font-weight: bold"><a id="new_event_button" href="" style="display:block; width: 100%; height: 100%">Nieuwe ouderavond</a></div>
+	
+	<div id="existing_events">
+	<!--
+		Te generen uit de database, voorbeeld hardcoded.
+	-->
+		<ul style="list-style-type: none;">
+			<li style="border: 1px solid #000000;">
+				<div id="event_title">
+					<b>Ouderavonden Paasrapport</b>
+				</div>
+				<div id="event_dates">
+					<table>
+						<tr>
+							<th>Data</th>
+						</tr>
+						<tr>
+							<td>23 september 2011</td><td>19:00 - 22:00</td>
+							<td>24 september 2011</td><td>19:00 - 21:30</td>
+							<td>25 september 2011</td><td>19:30 - 21:00</td>
+						</tr>
+					</table>
+				</div>
+				<div id="event_status">
+					<b>Status</b><br />
+					Uitnodigingen zijn nog niet verzonden
+					<form action="" method="post">
+						<input type="submit" value="Verstuur uitnodigingen" />
+					</form>
+				</div>
+			</li>
+			<li>
+				<div id="event_title">
+					<b>Ouderavonden Kerstrapport</b>
+				</div>
+				<div id="event_dates">
+					<table>
+						<tr>
+							<th>Data</th>
+						</tr>
+						<tr>
+							<td>23 september 2011</td><td>19:00 - 22:00</td>
+							<td>24 september 2011</td><td>19:00 - 21:30</td>
+							<td>25 september 2011</td><td>19:30 - 21:00</td>
+						</tr>
+					</table>
+				</div>
+				<div id="event_status">
+					<b>Status</b><br />
+					Inschrijving is geopend.
+				</div>
+			</li>
+			<li>
+				<div id="event_title">
+					<b>Ouderavonden Herfstrapport</b>
+				</div>
+				<div id="event_dates">
+					<table>
+						<tr>
+							<th>Data</th>
+						</tr>
+						<tr>
+							<td>23 september 2011</td><td>19:00 - 22:00</td>
+							<td>24 september 2011</td><td>19:00 - 21:30</td>
+							<td>25 september 2011</td><td>19:30 - 21:00</td>
+						</tr>
+					</table>
+				</div>
+				<div id="event_status">
+					<b>Status</b><br />
+					Ouderavond heeft plaatsgevonden
+				</div>
+			</li>
+		</ul>
+	</div>
+
+{% endblock %}
