@@ -76,6 +76,14 @@ class ListRegistrationsHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class AdministrationHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-new.html')
+        template_values = {
+        }
+        self.response.out.write(template.render(path, template_values))
+
+
 class FillDatabaseHandler(webapp.RequestHandler):
     def get(self):
         
@@ -120,7 +128,8 @@ def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
                                           ('/inschrijven', RegisterHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
-                                          ('/fill', FillDatabaseHandler)
+                                          ('/fill', FillDatabaseHandler),
+                                          ('/administratie', AdministrationHandler)                                          
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
