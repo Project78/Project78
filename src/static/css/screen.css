@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+/************************ 	BASIC TAG SETTINGS		************************/
+body {
+	font-family: "Trebuchet MS";
+	line-height: 20px;
+	font-size: 13px;
+}
+h1 {
+	font-size: 24px;
+	font-weight: bold;
+}
+h2 {
+	font-size: 18px;
+	font-weight: bold;
+	padding: 20px 0;
+}
+input {
+	font-size: 13px;
+	font-family: "Trebuchet MS";
+	padding: 0 5px;
+}
+
+/************************ 	COMMON STRUCTURE SETTINGS		************************/
+#content {
+	width: 900px;
+	padding: 30px;
+}
+#header {
+	border-bottom: 1px solid #333;
+}
+#logo {
+	float: left;
+	height: 100px;
+}
+#wrapper {
+	width: 960px;
+	margin: 0 auto;
+	padding: 10px 0 0 0;
+	border-width: 0 1px 0 1px;
+	border-color: #eee;
+	border-style: solid;
+}
+
+/************************ 	EVENT FORMS		************************/
+#event-form {
+	padding: 10px 0 0 0;
+}
+#event-form .label-pair {
+	padding: 0 0 5px 0;
+}
+#event-form .label-pair label {
+	width: 320px;
+	float: left;
+	display: block;
+}
+#event-form .label-pair input {
+	height: 30px;
+	border: 1px solid #ddd;
+	width: 310px;
+	line-height: 30px;
+}
+#event-form-dates {
+	width: 898px;
+}
+#event-form-date-list {
+	width: 449px;
+	float: left;
+}
+#event-form-date-list ul li {
+	text-align: center;
+	height: 45px;
+}
+#event-form-date-list ul li a {
+	padding-top: 15px;
+	width: 449px;
+	height: 30px;
+	display: block;
+	text-decoration: none;
+	border-width: 1px 0 0 0;
+	border-style: solid;
+	border-color: #ddd;
+}
+#event-form-date-list ul li a:hover {
+	background-color: #eee;
+}
+#event-form-date-list ul li a.event-form-date-last {
+	border-bottom: 1px solid #ddd;
+}
+#event-form-date-list ul li a.event-form-date-active {
+	background-color: #eee;
+}
+#event-form-date-properties {
+	background-color: #eee;
+	float: left;
+	padding: 15px 15px 10px 15px;
+	width: 419px;	
+}
+#event-form-date-properties .label-pair label {
+	width: 190px;
+	padding-right: 10px;
+}
+#event-form-date-properties .label-pair input {
+	width: 207px;
+}
+
+/************************ 	CLEARFIX 	************************/
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+html[xmlns] .clearfix {
+	display: block;
+}
+* html .clearfix {
+	height: 1%;
+}

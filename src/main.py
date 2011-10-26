@@ -193,7 +193,8 @@ def main():
                                           ('/fill', FillDatabaseHandler),
                                           ('/administratie', AdministrationHandler),
                                           ('/events', EventHandler),
-                                          ('/createEvent', CreateEvent)                                          
+                                          ('/createEvent', CreateEvent),
+                                          ('/administratie/nieuw-event', AdministrationHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
