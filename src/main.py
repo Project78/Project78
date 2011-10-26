@@ -92,8 +92,8 @@ class EventHandler(webapp.RequestHandler):
             for day in retrievedDays:
                 hours = day.date.hour
                 minutes = day.date.minute
-                if event.slots != None:
-                    minutes += event.slots * event.talk_time
+                if day.talks != None:
+                    minutes += day.talks * event.talk_time
                     
                 if minutes >= 60:
                     hours += int(math.floor(minutes / 60))
