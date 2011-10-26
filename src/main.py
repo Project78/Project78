@@ -96,6 +96,31 @@ class EventHandler(webapp.RequestHandler):
         }
         self.response.out.write(template.render(path, template_values))
 
+class CreateEvent(webapp.RequestHandler):
+    def get(self):
+        events = Event.all()
+        highest = 0
+        for event in events:
+            if highest < event.event_id:
+                highest = event.event_id
+        
+        new_event = Event(event_id=highest + 1,
+                          tables=40,
+                          talk_time=15)
+        new_event.put()
+        
+#        gestolen uit EventHandler
+        events = Event.all()
+        days = []
+        for event in events:
+            days.extend(Day.gql("WHERE event = :1", event))
+        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
+        template_values = {
+            'events': events,
+            'days': days         
+        }
+        self.response.out.write(template.render(path, template_values))
+
 class FillDatabaseHandler(webapp.RequestHandler):
     def get(self):
         
@@ -167,7 +192,8 @@ def main():
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
                                           ('/administratie', AdministrationHandler),
-                                          ('/events', EventHandler)                                          
+                                          ('/events', EventHandler),
+                                          ('/createEvent', CreateEvent)                                          
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
