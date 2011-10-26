@@ -79,12 +79,9 @@
 	}
 	</style>
 
-	<div id="new_event"><a id="new_event_button" href="/createEvent">Nieuwe ouderavond</a></div>
+	<div id="new_event"><a id="new_event_button" href="/administratie/nieuw-event">Nieuwe ouderavond</a></div>
 	
 	<div id="existing_events">
-	<!--
-		Te generen uit de database, voorbeeld hardcoded.
-	-->
 		<ul id="events">
 			{% for event in events %}
 			<li class="clearFix">
@@ -97,7 +94,7 @@
 							<th>Data</th>
 						</tr>
 						{% for day in days %}
-						{% ifequal day.event.event_id event.event_id %}
+						{% ifequal day.event.key event.key %}
 						<tr>
 							<td>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - 22:00</td>
 						</tr>
@@ -107,10 +104,7 @@
 				</div>
 				<div class="event_status">
 					<b>Status</b><br />
-					Uitnodigingen zijn nog niet verzonden
-					<form action="" method="post">
-						<input type="submit" value="Verstuur uitnodigingen" />
-					</form>
+					{{event.status}}
 				</div>
 			</li>
 			{% endfor %}
