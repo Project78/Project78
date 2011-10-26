@@ -15,6 +15,5 @@ class Event(db.Model):
     tables = db.IntegerProperty()
     talk_time = db.IntegerProperty()
     slots = db.IntegerProperty()
-    start_time = db.DateTimeProperty()
     status = db.StringProperty()
 

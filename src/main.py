@@ -18,6 +18,7 @@
 import os
 import cgi
 import datetime
+import math
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -28,7 +29,6 @@ from models.daypreference import DayPreference
 from models.event import Event
 from models.guardian import Guardian
 from models.timepreference import TimePreference
-
 
 class IndexHandler(webapp.RequestHandler):
     def get(self):
@@ -88,7 +88,19 @@ class EventHandler(webapp.RequestHandler):
         events = Event.all()
         days = []
         for event in events:
-            days.extend(Day.gql("WHERE event = :1", event))
+            retrievedDays = Day.gql("WHERE event = :1", event)
+            for day in retrievedDays:
+                hours = day.date.hour
+                minutes = day.date.minute
+                if event.slots != None:
+                    minutes += event.slots * event.talk_time
+                    
+                if minutes >= 60:
+                    hours += int(math.floor(minutes / 60))
+                    minutes %= 60
+                day.end_time = datetime.datetime(year=day.date.year, month=day.date.month, day=day.date.day, hour=hours, minute=minutes)
+                day.put()
+            days.extend(retrievedDays)
         path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
         template_values = {
             'events': events,

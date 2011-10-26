@@ -15,4 +15,5 @@ class Day(db.Model):
     date = db.DateTimeProperty()
     talks = db.IntegerProperty()
     event = db.ReferenceProperty(Event, collection_name="days")
+    end_time = db.DateTimeProperty()
     
