@@ -82,6 +82,14 @@ class AdministrationHandler(webapp.RequestHandler):
         template_values = {
         }
         self.response.out.write(template.render(path, template_values))
+    
+    def post(self):
+        a = self.request.POST['event-date']
+        a = [1, 2, 3, 4]
+        self.response.out.write("<table>")
+        for key, value in self.request.POST.iteritems():
+            self.response.out.write("<tr><td>" + key + "</td><td>" + value + "</td></tr>")
+        self.response.out.write("</table>")
 
 class EventHandler(webapp.RequestHandler):
     def get(self):

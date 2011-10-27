@@ -18,7 +18,20 @@ h2 {
 input {
 	font-size: 13px;
 	font-family: "Trebuchet MS";
+}
+li {
+	display: block;
+}
+
+/************************ 	FORM ELEMENT CLASSES		************************/
+.i-t {
+	height: 30px;
+	border: 1px solid #ddd;
+	line-height: 30px;
 	padding: 0 5px;
+}
+.i-s {
+	padding: 2px 5px;
 }
 
 /************************ 	COMMON STRUCTURE SETTINGS		************************/
@@ -54,54 +67,32 @@ input {
 	float: left;
 	display: block;
 }
-#event-form .label-pair input {
-	height: 30px;
-	border: 1px solid #ddd;
+#event-form .label-pair input.i-t {
 	width: 310px;
-	line-height: 30px;
 }
-#event-form-dates {
+#dates-section {
 	width: 898px;
+	padding-bottom: 40px;
 }
-#event-form-date-list {
-	width: 449px;
-	float: left;
+#dates-section span {
+	float:left;
+	width: 200px;
 }
-#event-form-date-list ul li {
-	text-align: center;
-	height: 45px;
+#dates-section span.date-nr, #dates-section span.date-nr-head {
+	width:30px;
 }
-#event-form-date-list ul li a {
-	padding-top: 15px;
-	width: 449px;
-	height: 30px;
-	display: block;
-	text-decoration: none;
-	border-width: 1px 0 0 0;
-	border-style: solid;
-	border-color: #ddd;
+#date-list span.date-nr {
+	
 }
-#event-form-date-list ul li a:hover {
-	background-color: #eee;
+#date-list input.i-t {
+	margin-right: 34px;
+	width: 150px;
 }
-#event-form-date-list ul li a.event-form-date-last {
-	border-bottom: 1px solid #ddd;
+#date-list input.i-s.st {
+margin: 10px 0 0 30px;
 }
-#event-form-date-list ul li a.event-form-date-active {
-	background-color: #eee;
-}
-#event-form-date-properties {
-	background-color: #eee;
-	float: left;
-	padding: 15px 15px 10px 15px;
-	width: 419px;	
-}
-#event-form-date-properties .label-pair label {
-	width: 190px;
-	padding-right: 10px;
-}
-#event-form-date-properties .label-pair input {
-	width: 207px;
+#date-list li {
+	padding-top: 5px;
 }
 
 /************************ 	CLEARFIX 	************************/

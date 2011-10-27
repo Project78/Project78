@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 	<head>
 		<title>{% block title %}Replace title{% endblock %}</title>
+		{% block css %}
 		<link type="text/css" rel="stylesheet" href="/static/css/reset.css" media="all" />
 		<link type="text/css" rel="stylesheet" href="/static/css/screen.css" media="all" />
+		{% endblock %}
 		<meta charset="UTF-8" />
-		{% block javascript %}{% endblock %}
-		{% block css %}{% endblock %}
+		{% block javascript %}
+			<script type="text/javascript" src="/static/js/jquery-1.6.4.js"></script>
+		{% endblock %}
 	</head>
 
 	<body>
