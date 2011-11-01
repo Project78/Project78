@@ -53,18 +53,34 @@ class RegisterHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
     
     def post(self):
-#        response = self.request.arguments()
-#        for arg in response:
-#            if "day_" in arg:
-#                print arg +" - "+ self.request.get(arg)
+        params = {}
+        for field in self.request.arguments():
+            params[field] = self.request.get(field)
+                    
+        days = {}
+        for key, value in params.items():
+            print key +" - "+ value
+            if not key.find("day_"):
+                days[key.replace("day_", "")] = value
+            print days
+        
+        for day, rank in days.items():
+            print day
+            print rank
+            new_day_preference = DayPreference()
+            new_day_preference.day = Day.all().filter("day_id =", int(day)).get()
+            new_day_preference.rank = int(rank)
+            new_day_preference.guardian_id =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
+            new_day_preference.save()
+            
 
-        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
-        template_values = {
-            'guardian_id': cgi.escape(self.request.get('guardian_id')),
-            'day_id': cgi.escape(self.request.get('day_id')),
-            'rank': cgi.escape(self.request.get('rank')),
-        }
-        self.response.out.write(template.render(path, template_values))
+#        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
+#        template_values = {
+#            'guardian_id': cgi.escape(self.request.get('guardian_id')),
+#            'day_id': cgi.escape(self.request.get('day_id')),
+#            'rank': cgi.escape(self.request.get('rank')),
+#        }
+#        self.response.out.write(template.render(path, template_values))
 
 
 class ListRegistrationsHandler(webapp.RequestHandler):
