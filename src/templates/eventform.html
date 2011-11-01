@@ -9,12 +9,18 @@
 <form method="post">
     {% for day in days %}
 	<label for="day_id">{{day.date}}</label>
-	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank1" value="1" />1 
+	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank1" value="1" checked="yes" />1 
 	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank2" value="2" />2 
 	<input type="radio" name="day_{{day.day_id}}" id="{{day.day_id}}-rank3" value="3" />3<br>
 	<br>
     {% endfor %}
+   	<label for="time_pref">Voorkeur voor tijdstip</label><br>
+	<input type="radio" name="time_pref" id="time_pref_1" value="0" checked="yes" />geen voorkeur<br> 
+	<input type="radio" name="time_pref" id="time_pref_2" value="1" />liever vroeg<br>
+	<input type="radio" name="time_pref" id="time_pref_3" value="2" />liever laat<br>
+    <br>
     <input type="hidden" name="guardian_id" value="{{guardian.guardian_id}}" />
+    <input type="hidden" name="event_id" value="{{event.event_id}}" />
 	<input type="submit" id="submit" value="Schrijf in" />
 </form>
 </body>
