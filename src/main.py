@@ -93,9 +93,12 @@ class RegisterHandler(webapp.RequestHandler):
 
 class ListRegistrationsHandler(webapp.RequestHandler):
     def get(self):
+        
+        events = Event.all().fetch(100)
+        
         path = os.path.join(os.path.dirname(__file__), 'templates/listregistrations.html')
         template_values = {
-            'greetings': "Hi"
+            'events': events
         }
         self.response.out.write(template.render(path, template_values))
 

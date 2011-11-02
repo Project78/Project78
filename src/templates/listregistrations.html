@@ -6,6 +6,11 @@
 <body>
 <h1>Inschrijvingen</h1>
 <p>Hier komt een lijst met inschrijvingen.</p>
+{% for event in events %}
+
+{{event.tables}}<br>
+
+{% endfor %}
 </body>
 
 </html>
