@@ -53,34 +53,42 @@ class RegisterHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
     
     def post(self):
+        # Pull in all POST arguments
         params = {}
         for field in self.request.arguments():
             params[field] = self.request.get(field)
-                    
+        
+        # Filter out ranking info for days            
         days = {}
         for key, value in params.items():
-            print key +" - "+ value
             if not key.find("day_"):
                 days[key.replace("day_", "")] = value
-            print days
         
+        # Build new day_preference entities
+        new_days = []
         for day, rank in days.items():
-            print day
-            print rank
             new_day_preference = DayPreference()
             new_day_preference.day = Day.all().filter("day_id =", int(day)).get()
             new_day_preference.rank = int(rank)
             new_day_preference.guardian_id =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
             new_day_preference.save()
-            
+            new_days.append(new_day_preference)
+        new_days.sort(key=lambda day: day.rank)
+        
+        # Build new time_preference
+        new_time_preference = TimePreference()
+        new_time_preference.guardian_id =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get()
+        new_time_preference.event_id = Event.all().filter("event_id =", int(self.request.get("event_id"))).get()
+        new_time_preference.time_pref = int(self.request.get("time_pref"))
+        new_time_preference.save()
+        
 
-#        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
-#        template_values = {
-#            'guardian_id': cgi.escape(self.request.get('guardian_id')),
-#            'day_id': cgi.escape(self.request.get('day_id')),
-#            'rank': cgi.escape(self.request.get('rank')),
-#        }
-#        self.response.out.write(template.render(path, template_values))
+        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
+        template_values = {
+            'days': new_days,
+            'time': new_time_preference
+        }
+        self.response.out.write(template.render(path, template_values))
 
 
 class ListRegistrationsHandler(webapp.RequestHandler):
