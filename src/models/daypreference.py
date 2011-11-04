@@ -5,8 +5,8 @@ Created on Oct 12, 2011
 '''
 
 from google.appengine.ext import db
-from models.day import Day
-from models.guardian import Guardian
+from day import Day
+from guardian import Guardian
 
 class DayPreference(db.Model):
     '''

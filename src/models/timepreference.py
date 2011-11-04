@@ -5,8 +5,8 @@ Created on Oct 12, 2011
 '''
 
 from google.appengine.ext import db
-from models.guardian import Guardian
-from models.event import Event
+from guardian import Guardian
+from event import Event
 
 class TimePreference(db.Model):
     '''

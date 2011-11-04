@@ -8,8 +8,15 @@
 <p>Hier komt een lijst met inschrijvingen.</p>
 {% for event in events %}
 
-{{event.tables}}<br>
-
+{{event.event_id}} - {{event.event_name}} - {{event.status}}<br>
+{{event.tables}} tafels, {{event.talk_time}} minuten per gesprek<br>
+<br>
+	{% for pref in event.time_preferences %}
+	
+		{{pref.guardian_id.guardian_id}}<br>
+	
+	{% endfor %}
+	<br>
 {% endfor %}
 </body>
 

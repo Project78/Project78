@@ -5,7 +5,7 @@ Created on Oct 12, 2011
 '''
 
 from google.appengine.ext import db
-from models.event import Event
+from event import Event
 
 class Day(db.Model):
     '''
