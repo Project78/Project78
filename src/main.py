@@ -17,17 +17,21 @@
 
 import os
 import cgi
+import csv
 import datetime
 import math
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
+from google.appengine.api.datastore import Key
 
 from models.day import Day
 from models.daypreference import DayPreference
 from models.event import Event
 from models.guardian import Guardian
+from models.student import Student
+from models.teacher import Teacher
 from models.timepreference import TimePreference
 
 class IndexHandler(webapp.RequestHandler):
@@ -208,11 +212,64 @@ class FillDatabaseHandler(webapp.RequestHandler):
                       event=new_event)
         new_day.put()
 
+class InitDataHandler(webapp.RequestHandler):
+    def get(self):
+        
+#        # Load all Guardians
+#        path = os.path.join(os.path.dirname(__file__), 'data/voogdouder.csv')
+#        my_file = open(path)
+#        fileReader = csv.reader(my_file) 
+#        for row in fileReader: 
+#            my_list = row[0].split(' ; ')
+#            new_guardian = Guardian(key_name=my_list[0])
+#            new_guardian.title=my_list[1]
+#            new_guardian.initials=my_list[2]
+#            new_guardian.preposition=my_list[3]
+#            new_guardian.lastname=my_list[4]
+#            new_guardian.streetname=my_list[6]
+#            new_guardian.housenumber=my_list[7]
+#            new_guardian.city=my_list[8]
+#            new_guardian.postalcode=my_list[9]
+#            new_guardian.email=my_list[12]
+#            new_guardian.save()
+#
+#        # Load all Students
+#        path = os.path.join(os.path.dirname(__file__), 'data/leerlingen.csv')
+#        my_file = open(path)
+#        fileReader = csv.reader(my_file) 
+#        for row in fileReader: 
+#            my_list = row[0].split(' ; ')
+#            new_student = Student(key_name=my_list[0])
+#            new_student.firstname=my_list[1]
+#            new_student.preposition=my_list[2]
+#            new_student.lastname=my_list[3]
+#            new_student.gender=my_list[4]
+#            new_student.class_id=my_list[5]
+#            new_student.guardian=Guardian.all().filter("__key__ >=", Key.from_path('Guardian', my_list[6])).get()
+#            new_student.save()
+
+        # Load all Teachers
+        path = os.path.join(os.path.dirname(__file__), 'data/docenten.csv')
+        my_file = open(path)
+        fileReader = csv.reader(my_file) 
+        for row in fileReader:
+            my_list = row[0].split(' ; ')
+            
+            print my_list[0]
+            new_teacher = Teacher(key_name=my_list[0])
+            new_teacher.name=my_list[1]
+            new_teacher.boxnumber=int(my_list[2], 0)
+#            new_teacher.email=my_list[3]
+#            new_teacher.save()
+
+
+
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
                                           ('/inschrijven', RegisterHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
+                                          ('/init', InitDataHandler),
                                           ('/administratie', EventHandler),
                                           ('/administratie/nieuw-event', AdministrationHandler)
                                           ],

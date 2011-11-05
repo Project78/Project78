@@ -10,7 +10,12 @@ class Guardian(db.Model):
     '''
     For all students, one parent (or guardian) will be registered
     '''
-    guardian_id = db.IntegerProperty()
-    firstname = db.StringProperty()
+    title = db.StringProperty()
+    initials = db.StringProperty()
     preposition = db.StringProperty()
     lastname = db.StringProperty()
+    streetname = db.StringProperty()
+    housenumber = db.StringProperty()
+    city = db.StringProperty()
+    postalcode = db.StringProperty()
+    email = db.EmailProperty()
