@@ -20,6 +20,7 @@ import cgi
 import csv
 import datetime
 import math
+import random
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -35,6 +36,7 @@ from models.student import Student
 from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
+from models.request import Request
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -166,51 +168,43 @@ class FillDatabaseHandler(webapp.RequestHandler):
         new_guardian.put()
         
         # Add an event
-        new_event = Event(event_id=1,
-                          tables=40,
+        new_event = Event(tables=40,
                           talk_time=15)
         new_event.put()
 
         # Add some days to the aforementioned event
-        new_day = Day(day_id=1,
-                      date=datetime.datetime(year=2011, month=11, day=11, hour=20, minute=00),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=11, hour=20, minute=00),
                       talks=12,
                       event=new_event)
         new_day.put()
 
-        new_day = Day(day_id=2,
-                      date=datetime.datetime(year=2011, month=11, day=12, hour=20, minute=00),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=12, hour=20, minute=00),
                       talks=12,
                       event=new_event)
         new_day.put()
 
-        new_day = Day(day_id=3,
-                      date=datetime.datetime(year=2011, month=11, day=13, hour=20, minute=00),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=13, hour=20, minute=00),
                       talks=12,
                       event=new_event)
         new_day.put()
         
         # Add an event
-        new_event = Event(event_id=2,
-                          tables=40,
+        new_event = Event(tables=40,
                           talk_time=15)
         new_event.put()
 
         # Add some days to the aforementioned event
-        new_day = Day(day_id=4,
-                      date=datetime.datetime(year=2011, month=11, day=20, hour=19, minute=30),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=20, hour=19, minute=30),
                       talks=12,
                       event=new_event)
         new_day.put()
 
-        new_day = Day(day_id=5,
-                      date=datetime.datetime(year=2011, month=11, day=21, hour=20, minute=00),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=21, hour=20, minute=00),
                       talks=12,
                       event=new_event)
         new_day.put()
 
-        new_day = Day(day_id=6,
-                      date=datetime.datetime(year=2011, month=11, day=22, hour=19, minute=45),
+        new_day = Day(date=datetime.datetime(year=2011, month=11, day=22, hour=19, minute=45),
                       talks=12,
                       event=new_event)
         new_day.put()
@@ -285,7 +279,55 @@ class InitDataHandler(webapp.RequestHandler):
             new_combination.save()
             print "Combination " + str(new_combination.key().id_or_name()) + " stored"
 
+class GenerateRandomEventHandler(webapp.RequestHandler):
+    def get(self):
+                
+        # Add an event
+        event = Event(name="paasrapport",
+                      tables=40,
+                      talk_time=15)
+        event.put()
 
+        # Add some days to the aforementioned event
+        day = Day(date=datetime.datetime(year=2011, month=11, day=11, hour=20, minute=00),
+                      talks=12,
+                      event=event)
+        day.put()
+
+        day = Day(date=datetime.datetime(year=2011, month=11, day=12, hour=20, minute=00),
+                      talks=12,
+                      event=event)
+        day.put()
+
+        day = Day(date=datetime.datetime(year=2011, month=11, day=13, hour=20, minute=00),
+                      talks=12,
+                      event=event)
+        day.put()
+        
+        guardians = Guardian.all().fetch(9999)
+        for guardian in guardians:
+            for child in guardian.children:
+                subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
+                selection = random.sample(subjects, random.randint(0, 3))
+                for choice in selection:
+                    request = Request()
+                    request.event = event
+                    request.guardian = guardian
+                    request.student = child
+                    request.combination = choice
+                    request.save()
+                    
+                    
+class DisplayRequestsHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'templates/requests.html')
+        template_values = {
+            'event': Event.all().filter('event_name', 'paasrapport').fetch(1),
+            'guardians': Guardian.all().fetch(9999)
+        }
+        self.response.out.write(template.render(path, template_values))        
+        
+        
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
@@ -293,6 +335,8 @@ def main():
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
                                           ('/init', InitDataHandler),
+                                          ('/generate', GenerateRandomEventHandler),
+                                          ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/administratie/nieuw-event', AdministrationHandler)
                                           ],

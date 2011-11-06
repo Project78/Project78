@@ -22,7 +22,7 @@
 1699 ; dhr. ; G. ;  ; Boerma ; ouder ; 't Kerkestuk ; 13 ; Reeuwijk ; 2811 BJ ; 06-2886601 ; 0182-886601 ; Boerma@planeet.nl
 1727 ; dhr. ; K. ;  ; Haaisma ; ouder ; Koolwijkseweg ; 23 ; Stolwijk ; 2821 NS ; 06-2982529 ; 0182-982529 ; Haaisma@hetweb.nl
 1755 ; dhr. ; O. ;  ; Klijnstra ; ouder ; Markt ; 33 ; Gouda ; 2801 JJ ; 06-3080025 ; 0182-80025 ; Klijnstra@xs4you.nl
-1783 ; dhr. ; S. ; Voogdholst ; voogd ; ouder ; Nansenstraat ; 10 ; Gouda ; 2806 HN ; 06-3179089 ; 0182-179089 ; Renia@zoggi.nl
+1783 ; dhr. ; S. ;  ; Voogdholst ; voogd ; ouder ; Nansenstraat ; 10 ; Gouda ; 2806 HN ; 06-3179089 ; 0182-179089 ; Renia@zoggi.nl
 1811 ; dhr. ; W. ;  ; Tammenga ; ouder ; Wipmolenerf ; 20 ; Gouda ; 2807 DJ ; 06-3279721 ; 0182-279721 ; Tammenga@freeweb.com
 1839 ; dhr. ; A. ;  ; Zwaga ; ouder ; Koningin Wilhelminaweg ; 30 ; Gouda ; 2802 HT ; 06-3381921 ; 0182-381921 ; Zwaga@gmailer.com
 1867 ; dhr. ; E. ;  ; Dekkinga ; ouder ; Veenzoom ; 7 ; Gouda ; 2804 CJ ; 06-3485689 ; 0182-485689 ; Dekkinga@hotmailing.com

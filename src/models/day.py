@@ -11,7 +11,6 @@ class Day(db.Model):
     '''
     Every Event is divided into Days 
     '''
-    day_id = db.IntegerProperty()
     date = db.DateTimeProperty()
     talks = db.IntegerProperty()
     event = db.ReferenceProperty(Event, collection_name="days")

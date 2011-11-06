@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Requests</title>
+</head>
+
+<body>
+<h1>Requests</h1>
+<p>Hier komt een lijst met inschrijvingen.</p>
+
+<ul>
+{% for guardian in guardians %}
+	<li>{{ guardian.title }} {{ guardian.initials }} {{ guardian.lastname }}</li>
+	<ul>
+		{% for child in guardian.children %}
+			<li>{{ child.firstname }} {{ child.lastname }}</li>
+			<ul>
+				{% for request in child.requests %}
+					<li>{{ request.combination.subject.name }}</li>
+				{% endfor %}
+			</ul>
+		{% endfor %}
+	</ul>
+{% endfor %}
+<ul>
+
+
+</body>
+</html>
