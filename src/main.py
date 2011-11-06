@@ -26,13 +26,16 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 from google.appengine.api.datastore import Key
 
+from models.event import Event
 from models.day import Day
 from models.daypreference import DayPreference
-from models.event import Event
+from models.timepreference import TimePreference
 from models.guardian import Guardian
 from models.student import Student
 from models.teacher import Teacher
-from models.timepreference import TimePreference
+from models.subject import Subject
+from models.combination import Combination
+
 
 class IndexHandler(webapp.RequestHandler):
     def get(self):
@@ -259,6 +262,29 @@ class InitDataHandler(webapp.RequestHandler):
             new_teacher.email=row[3].strip()
             new_teacher.save()
             print "Teacher " + new_teacher.key().id_or_name() + " stored"
+            
+        # Load all Subjects
+        path = os.path.join(os.path.dirname(__file__), 'data/vakken.txt')
+        my_file = open(path)
+        fileReader = csv.reader(my_file, delimiter=";") 
+        for row in fileReader:
+            new_subject = Subject(key_name=row[0].strip())
+            new_subject.name=row[1].strip()
+            new_subject.save()
+            print "Subject " + new_subject.key().id_or_name() + " stored"
+
+        # Load all Students
+        path = os.path.join(os.path.dirname(__file__), 'data/docent_vak.txt')
+        my_file = open(path)
+        fileReader = csv.reader(my_file, delimiter=";") 
+        for row in fileReader: 
+            new_combination = Combination()
+            new_combination.class_id=row[0].strip()
+            new_combination.subject=Subject.all().filter("__key__ >=", Key.from_path('Subject', row[1].strip())).get()
+            new_combination.teacher=Teacher.all().filter("__key__ >=", Key.from_path('Teacher', row[2].strip())).get()
+            new_combination.save()
+            print "Combination " + str(new_combination.key().id_or_name()) + " stored"
+
 
 
 def main():
