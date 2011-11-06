@@ -308,7 +308,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
         for guardian in guardians:
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
-                selection = random.sample(subjects, random.randint(0, 3))
+                selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
                 for choice in selection:
                     request = Request()
                     request.event = event
