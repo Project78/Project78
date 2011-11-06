@@ -215,53 +215,50 @@ class FillDatabaseHandler(webapp.RequestHandler):
 class InitDataHandler(webapp.RequestHandler):
     def get(self):
         
-#        # Load all Guardians
-#        path = os.path.join(os.path.dirname(__file__), 'data/voogdouder.csv')
-#        my_file = open(path)
-#        fileReader = csv.reader(my_file) 
-#        for row in fileReader: 
-#            my_list = row[0].split(' ; ')
-#            new_guardian = Guardian(key_name=my_list[0])
-#            new_guardian.title=my_list[1]
-#            new_guardian.initials=my_list[2]
-#            new_guardian.preposition=my_list[3]
-#            new_guardian.lastname=my_list[4]
-#            new_guardian.streetname=my_list[6]
-#            new_guardian.housenumber=my_list[7]
-#            new_guardian.city=my_list[8]
-#            new_guardian.postalcode=my_list[9]
-#            new_guardian.email=my_list[12]
-#            new_guardian.save()
-#
-#        # Load all Students
-#        path = os.path.join(os.path.dirname(__file__), 'data/leerlingen.csv')
-#        my_file = open(path)
-#        fileReader = csv.reader(my_file) 
-#        for row in fileReader: 
-#            my_list = row[0].split(' ; ')
-#            new_student = Student(key_name=my_list[0])
-#            new_student.firstname=my_list[1]
-#            new_student.preposition=my_list[2]
-#            new_student.lastname=my_list[3]
-#            new_student.gender=my_list[4]
-#            new_student.class_id=my_list[5]
-#            new_student.guardian=Guardian.all().filter("__key__ >=", Key.from_path('Guardian', my_list[6])).get()
-#            new_student.save()
-
-        # Load all Teachers
-        path = os.path.join(os.path.dirname(__file__), 'data/docenten.csv')
+        # Load all Guardians
+        path = os.path.join(os.path.dirname(__file__), 'data/voogdouder.txt')
         my_file = open(path)
-        fileReader = csv.reader(my_file) 
-        for row in fileReader:
-            my_list = row[0].split(' ; ')
-            
-            print my_list[0]
-            new_teacher = Teacher(key_name=my_list[0])
-            new_teacher.name=my_list[1]
-            new_teacher.boxnumber=int(my_list[2], 0)
-#            new_teacher.email=my_list[3]
-#            new_teacher.save()
+        fileReader = csv.reader(my_file, delimiter=";") 
+        for row in fileReader: 
+            new_guardian = Guardian(key_name=row[0].strip())
+            new_guardian.title=row[1].strip()
+            new_guardian.initials=row[2].strip()
+            new_guardian.preposition=row[3].strip()
+            new_guardian.lastname=row[4].strip()
+            new_guardian.streetname=row[6].strip()
+            new_guardian.housenumber=row[7].strip()
+            new_guardian.city=row[8].strip()
+            new_guardian.postalcode=row[9].strip()
+            new_guardian.email=row[12].strip()
+            new_guardian.save()
+            print "Guardian " + new_guardian.key().id_or_name() + " stored"
 
+        # Load all Students
+        path = os.path.join(os.path.dirname(__file__), 'data/leerlingen.txt')
+        my_file = open(path)
+        fileReader = csv.reader(my_file, delimiter=";") 
+        for row in fileReader: 
+            new_student = Student(key_name=row[0].strip())
+            new_student.firstname=row[1].strip()
+            new_student.preposition=row[2].strip()
+            new_student.lastname=row[3].strip()
+            new_student.gender=row[4].strip()
+            new_student.class_id=row[5].strip()
+            new_student.guardian=Guardian.all().filter("__key__ >=", Key.from_path('Guardian', row[6].strip())).get()
+            new_student.save()
+            print "Student " + new_student.key().id_or_name() + " stored"
+            
+        # Load all Teachers
+        path = os.path.join(os.path.dirname(__file__), 'data/docenten.txt')
+        my_file = open(path)
+        fileReader = csv.reader(my_file, delimiter=";") 
+        for row in fileReader:
+            new_teacher = Teacher(key_name=row[0].strip())
+            new_teacher.name=row[1].strip()
+            new_teacher.boxnumber=int(row[2].strip())
+            new_teacher.email=row[3].strip()
+            new_teacher.save()
+            print "Teacher " + new_teacher.key().id_or_name() + " stored"
 
 
 def main():
