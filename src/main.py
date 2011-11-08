@@ -79,16 +79,16 @@ class RegisterHandler(webapp.RequestHandler):
             new_day_preference = DayPreference()
             new_day_preference.day = Day.all().filter("day_id =", int(day)).get()
             new_day_preference.rank = int(rank)
-            new_day_preference.guardian_id =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
+            new_day_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
             new_day_preference.save()
             new_days.append(new_day_preference)
         new_days.sort(key=lambda day: day.rank)
         
         # Build new time_preference
         new_time_preference = TimePreference()
-        new_time_preference.guardian_id =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get()
-        new_time_preference.event_id = Event.all().filter("event_id =", int(self.request.get("event_id"))).get()
-        new_time_preference.time_pref = int(self.request.get("time_pref"))
+        new_time_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get()
+        new_time_preference.event = Event.all().filter("event_id =", int(self.request.get("event_id"))).get()
+        new_time_preference.preference = int(self.request.get("time_pref"))
         new_time_preference.save()
         
 
@@ -306,6 +306,19 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
         
         guardians = Guardian.all().fetch(9999)
         for guardian in guardians:
+            time = TimePreference()
+            time.event = event
+            time.guardian = guardian
+            time.preference = random.randint(0, 2)
+            time.save()
+            days = event.days.fetch(999)
+            random.shuffle(days)
+            for i, day in enumerate(days):
+                day_pref = DayPreference()
+                day_pref.guardian = guardian
+                day_pref.day = day
+                day_pref.rank = i
+                day_pref.save()
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
