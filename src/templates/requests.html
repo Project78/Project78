@@ -8,8 +8,17 @@
 <p>Hier komt een lijst met inschrijvingen.</p>
 
 <ul>
-{% for guardian in guardians %}
-	<li>{{ guardian.title }} {{ guardian.initials }} {{ guardian.lastname }}</li>
+{% for guardian in guardians|slice:":5" %}
+	<li>{{ guardian.title }} {{ guardian.initials }} {{ guardian.lastname }} {{ event.get_key }}</li>
+	{% for time in guardian.time_preferences %}
+	{% ifequal time.event.key event.key %}
+	<li>
+		Voorkeur: {% ifequal time.preference 0 %}Geen{% endifequal %}
+				  {% ifequal time.preference 1 %}Vroeg{% endifequal %}
+				  {% ifequal time.preference 2 %}Laat{% endifequal %}
+	</li>
+	{% endifequal %}
+	{% endfor %}
 	<ul>
 		{% for child in guardian.children %}
 			<li>{{ child.firstname }} {{ child.lastname }}</li>

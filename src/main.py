@@ -281,6 +281,9 @@ class InitDataHandler(webapp.RequestHandler):
 
 class GenerateRandomEventHandler(webapp.RequestHandler):
     def get(self):
+        
+        # Set random seed
+        random.seed(1138)
                 
         # Add an event
         event = Event(name="paasrapport",
