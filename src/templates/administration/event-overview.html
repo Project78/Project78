@@ -93,12 +93,10 @@
 						<tr>
 							<th>Data</th>
 						</tr>
-						{% for day in days %}
-						{% ifequal day.event.key event.key %}
+						{% for day in event.days %}
 						<tr>
 							<td>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>&nbsp;{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - {{day.end_time.hour}}:{{day.end_time.minute}}{% ifequal day.end_time.minute 0 %}0{% endifequal %}</td>
 						</tr>
-						{% endifequal %}
 						{% endfor %}
 					</table>
 				</div>
