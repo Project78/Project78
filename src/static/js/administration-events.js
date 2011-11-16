@@ -12,25 +12,43 @@ function init() {
 	addInitialDatePickers();
 }
 
-/**
- * Add the initial datePickers to the date fields when the page is loaded.
- * 
- * @author Maarten van den Hoek
- */
-function addInitialDatePickers() {
-	addDateEntryDatepicker(1);
-	$("#i-reminder-datepicker").datepicker({
+function addInitialDatePickers(){
+	var $ = jQuery;
+	$("#i-startdate-datepicker").datepicker({
+		minDate : '0',
 		onSelect : function(date, inst) {
 			var d = new Date(Date.parse($(this).datepicker('getDate')));
 			var df = $.datepicker.formatDate('yy-mm-dd', d);
-			$('#i-reminder-date').attr('value', df);
+			$('#i-startdate').attr('value', df);
 		}
 	});
 	$.datepicker.setDefaults($.datepicker.regional['nl']);
 	$.datepicker.setDefaults({
 		dateFormat : 'dd MM yy'
-	});
+	});			
 }
+
+// DON'T REMOVE THIS FUNCTION
+///**
+// * Add the initial datePickers to the date fields when the page is loaded.
+// * 
+// * @author Maarten van den Hoek
+// */
+//function addInitialDatePickers() {
+//	var $ = jQuery;
+//	addDateEntryDatepicker(1);
+//	$("#i-reminder-datepicker").datepicker({
+//		onSelect : function(date, inst) {
+//			var d = new Date(Date.parse($(this).datepicker('getDate')));
+//			var df = $.datepicker.formatDate('yy-mm-dd', d);
+//			$('#i-reminder-date').attr('value', df);
+//		}
+//	});
+//	$.datepicker.setDefaults($.datepicker.regional['nl']);
+//	$.datepicker.setDefaults({
+//		dateFormat : 'dd MM yy'
+//	});
+//}
 
 /**
  * 
@@ -39,6 +57,7 @@ function addInitialDatePickers() {
  * @author Maarten van den Hoek
  */
 function addDateEntryDatepicker(n) {
+	var $ = jQuery;
 	$("#i-datepicker-event-" + n).datepicker({
 		onSelect : function(date, inst) {
 			var d = new Date(Date.parse($(this).datepicker('getDate')));

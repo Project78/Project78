@@ -15,74 +15,30 @@
 {% block content %}
 <div id="content">
 	<a href="/administratie">Terug naar het overzicht</a>
+	<h1>Nieuwe ouderavondreeks</h1>	
 	<form id="event-form" method="post" action="">
 		
+		<!-- Error information -->
+		{% if errors %}
+		<div id="errors">
+			<h2>Foutmeldingen</h2>
+			<ul>
+				{% for error in errors %}
+				<li>{{ error }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+		
 		<!-- Main information -->
-		<h1>Nieuwe ouderavondreeks</h1>
-		<h2>Algemene informatie</h1>
 		<div class="label-pair clearfix">
 			<label>Titel ouderavondreeks</label>
 			<input type="text" name="i-name" value="" />
 		</div>
 		<div class="label-pair clearfix">
-			<label>Datum herinnering voor versturen voor uitnodigingen</label>
-			<input type="hidden" id="i-reminder-date" name="i-reminder-date" value="" />
-			<input type="text" id="i-reminder-datepicker" name="i-reminder-datepicker" value="" />
-		</div>
-		<div class="label-pair clearfix">
-			<label>Lengte slots</label>
-			<input type="text" name="i-talktime" value="" />
-		</div>			
-		
-		<div class="label-pair clearfix">
-			<label>Aantal tafels</label>
-			<input type="text" name="i-tables" value="" />
-		</div>			
-		
-		<!-- Subscription period -->
-		<h2>Inschrijfperiode</h2>
-		<div class="label-pair clearfix">
-			<label>Opening inschrijfperiode</label>
-			<input type="text" name="i-subscr-open" value="" />
-		</div>
-		<div class="label-pair clearfix">
-			<label>Sluiting inschrijfperiode</label>
-			<input type="text" name="i-subscr-close" value="" />
-		</div>
-
-		<!-- Dates section -->
-		<div id="dates-section" class="clearfix">	
-			<h2>Data</h2>
-			<div class="clearfix">
-				<p>
-					<span class="date-nr-head">#</span>
-					<span>Datum</span>
-					<span>Start tijd</span>
-					<span>Aantal slots</span>
-				</p>
-			</div>
-			<ul id="date-list">
-				<li id="date-entry-sample">				
-					<p><span class="date-nr">1</span></p>
-					<input type="hidden" id="i-nr-0" class="i-nr" name="i-nr" value="0" />
-					<input type="hidden" id="i-date-event-0" class="i-date-event" name="i-date-event" value="" />
-					<input type="text" id="i-datepicker-event-0" class="i-datepicker-event" class="i-datepicker-event" name="i-datepicker-event" value="" />
-					<input type="text" id="i-starttime-0" class="i-starttime" name="i-starttime" value="" />	
-					<input type="text" id="i-slots-0" class="i-slots" name="i-slots" value="" />
-					<input type="checkbox" id="i-remove-date-0" class="i-remove-date" name="i-remove-date" value="Verwijder datum" />
-				</li>
-				<li class="date-entry">				
-					<p><span class="date-nr">1</span></p>
-					<input type="hidden" id="i-nr-1" class="i-nr" name="i-nr" value="1" />
-					<input type="hidden" id="i-date-event-1" class="i-date-event" name="i-date-event" value="" />
-					<input type="text" id="i-datepicker-event-1" class="i-datepicker-event" class="i-datepicker-event" name="i-datepicker-event" value="" />
-					<input type="text" id="i-starttime-1" class="i-starttime" name="i-starttime" value="" />	
-					<input type="text" id="i-slots-1" class="i-slots" name="i-slots" value="" />
-					<input type="checkbox" id="i-remove-date-1" class="i-remove-date" name="i-remove-date" value="Verwijder datum" />
-				</li>
-				<input type="submit" id="i-add-date-entry" name="i-add-date-entry" class="st" onclick="addDateEntry(); return false;" value="Voeg datum toe" />
-				<input type="submit" id="i-remove-date-entries" name="i-remove-date-entries" onclick="removeDateEntries(); return false;" value="Verwijder geselecteerde data" />
-			</ul>
+			<label>Startdatum</label>
+			<input id="i-startdate" type="hidden" name="i-startdate" />
+			<input id="i-startdate-datepicker" type="text" value="" />
 		</div>
 		<input type="submit" name="submitForm" value="Opslaan" />
 	</form>
