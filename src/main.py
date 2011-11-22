@@ -41,6 +41,7 @@ from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
 from handlers.newevent import NewEvent
+from handlers.editevent import EditEvent
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -343,7 +344,7 @@ def main():
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
-                                          ('/administratie/nieuw-event', NewEvent)
+                                          ('/administratie/event/(nieuw|\d+)', EditEvent)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
