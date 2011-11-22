@@ -40,6 +40,7 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
+from handlers.newevent import NewEvent
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -113,22 +114,6 @@ class ListRegistrationsHandler(webapp.RequestHandler):
             'events': events
         }
         self.response.out.write(template.render(path, template_values))
-
-
-class AdministrationHandler(webapp.RequestHandler):
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-new.html')
-        template_values = {
-        }
-        self.response.out.write(template.render(path, template_values))
-    
-    def post(self):
-        a = self.request.POST['event-date']
-        a = [1, 2, 3, 4]
-        self.response.out.write("<table>")
-        for key, value in self.request.POST.iteritems():
-            self.response.out.write("<tr><td>" + key + "</td><td>" + value + "</td></tr>")
-        self.response.out.write("</table>")
 
 class EventHandler(webapp.RequestHandler):
     def get(self):
@@ -357,8 +342,8 @@ def main():
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
-                                          ('/administratie/nieuw-event', AdministrationHandler),
-                                          ('/clear', bulkdelete)
+                                          ('/clear', bulkdelete),
+                                          ('/administratie/nieuw-event', NewEvent)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
