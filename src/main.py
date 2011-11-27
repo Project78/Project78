@@ -360,6 +360,7 @@ class DisplayPrefsHandler(webapp.RequestHandler):
             'guardians': Guardian.all().fetch(9999)
         }
         self.response.out.write(template.render(path, template_values))        
+<<<<<<< HEAD
        
 
 class PlanHandler(webapp.RequestHandler):    
@@ -394,6 +395,25 @@ class PlanHandler(webapp.RequestHandler):
             
         
         # build a list of dictionaries defining request-sets based on preferred days
+=======
+    
+class bulkdelete(webapp.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        path = "models"
+        dirList = os.listdir(path)
+        for fname in dirList:
+            if fnmatch.fnmatch(fname, '*.py') and not fnmatch.fnmatch(fname, '_*'):
+                try:
+                    while True:
+                        q = db.GqlQuery("SELECT __key__ FROM " + fname.capitalize().split('.')[0].replace('preference', 'Preference'))
+                        assert q.count()
+                        db.delete(q.fetch(200))
+                        time.sleep(0.5)
+                except Exception, e:
+                    self.response.out.write(repr(e)+'\n')
+                    pass
+>>>>>>> 75a6826a221ecba687df7adce4d458b7e470c905
         
 
 
