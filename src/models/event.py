@@ -14,3 +14,6 @@ class Event(db.Model):
     tables = db.IntegerProperty()
     talk_time = db.IntegerProperty()
     status = db.StringProperty()
+
+    def get_key(self):
+        return "bla"

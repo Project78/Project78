@@ -7,17 +7,16 @@ body {
 	font-size: 13px;
 }
 h1 {
-	font-size: 1.85em;
+	font-size: 24px;
 	font-weight: bold;
-	padding: 10px 0;
 }
 h2 {
-	font-size: 1.38em;
+	font-size: 18px;
 	font-weight: bold;
 	padding: 20px 0;
 }
 input {
-	font-size: 1em;
+	font-size: 13px;
 	font-family: "Trebuchet MS";
 }
 li {
@@ -60,22 +59,6 @@ li {
 #event-form {
 	padding: 10px 0 0 0;
 }
-
-#event-form #errors {
-	background-color: #ff8080;
-	padding: 0 15px 15px 15px;
-	margin-bottom: 20px;
-}
-#event-form #errors h2 {
-	color: #fff;
-}
-#event-form #errors ul {
-	list-style: disc inside none;
-	color: white;
-}
-#event-form #errors ul li {
-	display: list-item;
-}
 #event-form .label-pair {
 	padding: 0 0 5px 0;
 }
@@ -87,7 +70,6 @@ li {
 #event-form .label-pair input.i-t {
 	width: 310px;
 }
-
 #dates-section {
 	width: 898px;
 	padding-bottom: 40px;
@@ -107,7 +89,7 @@ li {
 	width: 150px;
 }
 #date-list input.i-s.st {
-	margin: 10px 0 0 30px;
+margin: 10px 0 0 30px;
 }
 #date-list li {
 	padding-top: 5px;
@@ -130,101 +112,4 @@ html[xmlns] .clearfix {
 }
 * html .clearfix {
 	height: 1%;
-}
-
-/************************ 	EVENT OVERVIEW		************************/
-th
-{
-	text-align: left;
-}
-	
-div#new_event
-{
-	width: 960px; 
-	height: 50px; 
-	border: 1px solid #000000;
-	font-weight: bold;
-}
-	
-a#new_event_button
-{
-	text-align: center;
-	margin-top: 8px;
-	color: #000000;
-	text-decoration: none;
-	display:block;
-	width: 100%; 
-	height: 100%;
-}
-	
-ul#events
-{
-	margin: 0;
-	margin-top: 20px;
-	padding: 0;
-	list-style-type: none;
-}
-
-ul#events li
-{
-	width: 960px;
-	border-width: 1px 1px 0 1px;
-	border-style: solid;
-	border-color: #000000;
-}
-
-ul#events li:last-child
-{
-	width: 960px;
-	border-width: 1px 1px 1px 1px;
-	border-style: solid;
-	border-color: #000000;
-}
-
-.clearFix div.event_title, .clearFix div.event_status, .clearFix div.event_dates
-{
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	position: relative; 
-	float: left; 
-	width: 290px;
-}
-
-.clearFix div.event_title
-{
-	clear: both;
-}
-
-#fontScaling
-{
-	font-size: 13px;
-	position: relative;
-	float: right;
-	margin-right: 10px;
-	margin-top: 15px;
-}
-
-#fontScaling a
-{ 
-	color: #000000;
-}
-
-.scale1
-{
-	font-size: 13px;
-	text-decoration: underline;
-}
-	
-.scale2
-{
-	font-size: 16px;
-	text-decoration: none;
-}
-	
-.scale3
-{
-	font-size: 19px;
-	text-decoration: none;
 }

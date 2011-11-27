@@ -1,6 +1,84 @@
 {% extends "event-base.html" %}
 
 {% block content %}
+
+	<style type="text/css">
+	th
+	{
+		text-align: left;
+	}
+	
+	div#new_event
+	{
+		width: 960px; 
+		height: 50px; 
+		border: 1px solid #000000; 
+		font-size: 28; 
+		font-weight: bold;
+	}
+	
+	a#new_event_button
+	{
+		text-align: center;
+		margin-top: 8px;
+		color: #000000;
+		text-decoration: none;
+		display:block;
+		width: 100%; 
+		height: 100%;
+	}
+	
+	ul#events
+	{
+		margin: 0;
+		margin-top: 20px;
+		padding: 0;
+		list-style-type: none;
+	}
+	
+	ul#events li
+	{
+		width: 960px;
+		border-width: 1px 1px 0 1px;
+		border-style: solid;
+		border-color: #000000;
+	}
+
+	ul#events li:last-child
+	{
+		width: 960px;
+		border-width: 1px 1px 1px 1px;
+		border-style: solid;
+		border-color: #000000;
+	}
+
+	
+	.clearFix:after
+	{
+		clear: both;
+		display: block;
+		height: 0;
+		content: ".";
+		visibility: hidden;
+	}
+	
+	.clearFix div
+	{
+		padding-left: 15px;
+		padding-right: 15px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		position: relative; 
+		float: left; 
+		width: 290px;
+	}
+	
+	.clearFix div.event_title
+	{
+		clear: both;
+	}
+	</style>
+
 	<div id="new_event"><a id="new_event_button" href="/administratie/nieuw-event">Nieuwe ouderavond</a></div>
 	
 	<div id="existing_events">
@@ -15,10 +93,12 @@
 						<tr>
 							<th>Data</th>
 						</tr>
-						{% for day in event.days %}
+						{% for day in days %}
+						{% ifequal day.event.key event.key %}
 						<tr>
 							<td>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>&nbsp;{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - {{day.end_time.hour}}:{{day.end_time.minute}}{% ifequal day.end_time.minute 0 %}0{% endifequal %}</td>
 						</tr>
+						{% endifequal %}
 						{% endfor %}
 					</table>
 				</div>

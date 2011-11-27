@@ -16,19 +16,16 @@
 #
 
 import os
-import fnmatch
 import cgi
 import csv
 import datetime
 import math
 import random
-import time
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 from google.appengine.api.datastore import Key
-from google.appengine.ext import db
 
 from models.event import Event
 from models.day import Day
@@ -40,8 +37,6 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
-from handlers.newevent import NewEvent
-from handlers.editevent import EditEvent
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -116,12 +111,44 @@ class ListRegistrationsHandler(webapp.RequestHandler):
         }
         self.response.out.write(template.render(path, template_values))
 
+
+class AdministrationHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-new.html')
+        template_values = {
+        }
+        self.response.out.write(template.render(path, template_values))
+    
+    def post(self):
+        a = self.request.POST['event-date']
+        a = [1, 2, 3, 4]
+        self.response.out.write("<table>")
+        for key, value in self.request.POST.iteritems():
+            self.response.out.write("<tr><td>" + key + "</td><td>" + value + "</td></tr>")
+        self.response.out.write("</table>")
+
 class EventHandler(webapp.RequestHandler):
     def get(self):
         events = Event.all()
+        days = []
+        for event in events:
+            retrievedDays = Day.gql("WHERE event = :1", event)
+            for day in retrievedDays:
+                hours = day.date.hour
+                minutes = day.date.minute
+                if day.talks != None:
+                    minutes += day.talks * event.talk_time
+                    
+                if minutes >= 60:
+                    hours += int(math.floor(minutes / 60))
+                    minutes %= 60
+                day.end_time = datetime.datetime(year=day.date.year, month=day.date.month, day=day.date.day, hour=hours, minute=minutes)
+                day.put()
+            days.extend(retrievedDays)
         path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
         template_values = {
-            'events': events      
+            'events': events,
+            'days': days         
         }
         self.response.out.write(template.render(path, template_values))
 
@@ -259,7 +286,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
         random.seed(1138)
                 
         # Add an event
-        event = Event(event_name="paasrapport",
+        event = Event(name="paasrapport",
                       tables=40,
                       talk_time=15)
         event.put()
@@ -280,7 +307,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                       event=event)
         day.put()
         
-        guardians = Guardian.all()
+        guardians = Guardian.all().fetch(9999)
         for guardian in guardians:
             time = TimePreference()
             time.event = event
@@ -293,10 +320,10 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref = DayPreference()
                 day_pref.guardian = guardian
                 day_pref.day = day
-                day_pref.rank = i+1
+                day_pref.rank = i
                 day_pref.save()
             for child in guardian.children:
-                subjects = Combination.all().filter('class_id', child.class_id).fetch(999)
+                subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
                 for choice in selection:
                     request = Request()
@@ -311,140 +338,12 @@ class DisplayRequestsHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/requests.html')
         template_values = {
-            'event': Event.all().get(),
+            'event': Event.all().filter('event_name', 'paasrapport').fetch(1),
             'guardians': Guardian.all().fetch(9999)
         }
         self.response.out.write(template.render(path, template_values))        
-
-
-
-class DisplayTestHandler(webapp.RequestHandler):
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'templates/testset.html')
-        template_values = {
-            'event': Event.all().get(),
-            'guardians': Guardian.all().fetch(9999)
-        }
-        self.response.out.write(template.render(path, template_values))        
-
-class DisplayStatsHandler(webapp.RequestHandler):
-    def get(self):
-        guardians = Guardian.all().fetch(9999)
-        geen = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        vroeg = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        laat = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for guardian in guardians:
-            if guardian.time_preferences.get().preference == 0:
-                geen[guardian.requests.count()] = geen[guardian.requests.count()]+1
-            if guardian.time_preferences.get().preference == 1:
-                vroeg[guardian.requests.count()] = vroeg[guardian.requests.count()]+1
-            if guardian.time_preferences.get().preference == 2:
-                laat[guardian.requests.count()] = laat[guardian.requests.count()]+1
         
-        print geen
-        print vroeg
-        print laat
         
-#        path = os.path.join(os.path.dirname(__file__), 'templates/stats.html')
-#        template_values = {
-#            'lijst': Event.all().get(),
-#            'guardians': Guardian.all().fetch(9999)
-#        }
-#        self.response.out.write(template.render(path, template_values))        
-
-class DisplayPrefsHandler(webapp.RequestHandler):
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'templates/prefs.html')
-        template_values = {
-            'lijst': Event.all().get(),
-            'guardians': Guardian.all().fetch(9999)
-        }
-        self.response.out.write(template.render(path, template_values))
-       
-
-class PlanHandler(webapp.RequestHandler):    
-    def get(self):
-        guardians = Guardian.all().fetch(10)
-        current_event = Event.all().filter("event_name", "paasrapport").get()
-        requests = Request.all().filter("event", current_event).fetch(9999)
-        days = Day.all().filter("event", current_event).fetch(100)
-        print days
-        max_rank = DayPreference.all().order('-rank').get().rank
-        print max_rank
-            
-        # build a dictionary defining request-sets of a specific lengths
-        lengths = {}
-        for guardian in guardians:
-            requests = guardian.requests.filter("event", current_event).fetch(guardian.requests.filter("event", current_event).count())
-            print requests
-            count = len(requests)
-            print count
-            if not count in lengths:
-                lengths[count] = [requests]
-                print "New length"
-            else:
-                lengths[count].append(requests)
-                print "Existing length"
-            
-        for length in sorted(lengths.items(), reverse=True):
-            for day in days:
-                
-                for my_requests in length[1]:
-                    print my_requests
-            
-        
-        # build a list of dictionaries defining request-sets based on preferred days
-        
-#        event = Event.all().get()
-#        days = [day for day in event.days]
-
-    def intersect(self, a, b):
-        return list(set(a) & set(b))
-    
-    
-=======
->>>>>>> 75a6826a221ecba687df7adce4d458b7e470c905
-    
-class bulkdelete(webapp.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        path = "models"
-        dirList = os.listdir(path)
-        for fname in dirList:
-            if fnmatch.fnmatch(fname, '*.py') and not fnmatch.fnmatch(fname, '_*'):
-                try:
-                    while True:
-                        q = db.GqlQuery("SELECT __key__ FROM " + fname.capitalize().split('.')[0].replace('preference', 'Preference'))
-                        assert q.count()
-                        db.delete(q.fetch(200))
-                        time.sleep(0.5)
-                except Exception, e:
-                    self.response.out.write(repr(e)+'\n')
-                    pass
-<<<<<<< HEAD
-    
-class bulkdelete2(webapp.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        path = "models"
-        dirList = os.listdir(path)
-        for fname in dirList:
-            if fnmatch.fnmatch(fname, '*.py') and not fnmatch.fnmatch(fname, '_*'):
-                try:
-                    while True:
-                        q = db.GqlQuery("SELECT __key__ FROM " + fname.capitalize().split('.')[0].replace('preference', 'Preference'))
-                        assert q.count()
-                        db.delete(q.fetch(200))
-                        time.sleep(0.5)
-                except Exception, e:
-                    self.response.out.write(repr(e)+'\n')
-                    pass
-
-=======
->>>>>>> 75a6826a221ecba687df7adce4d458b7e470c905
-        
-
-
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
@@ -454,13 +353,8 @@ def main():
                                           ('/init', InitDataHandler),
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/requests', DisplayRequestsHandler),
-                                          ('/test', DisplayTestHandler),
-                                          ('/stats', DisplayStatsHandler),
-                                          ('/prefs', DisplayPrefsHandler),
-                                          ('/plan', PlanHandler),
                                           ('/administratie', EventHandler),
-                                          ('/clear', bulkdelete),
-                                          ('/administratie/event/(nieuw|\d+)', EditEvent)
+                                          ('/administratie/nieuw-event', AdministrationHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

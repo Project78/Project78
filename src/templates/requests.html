@@ -9,7 +9,7 @@
 
 <ul>
 {% for guardian in guardians|slice:":5" %}
-	<li>{{ guardian.title }} {{ guardian.initials }} {{ guardian.lastname }}</li>
+	<li>{{ guardian.title }} {{ guardian.initials }} {{ guardian.lastname }} {{ event.get_key }}</li>
 	{% for time in guardian.time_preferences %}
 	{% ifequal time.event.key event.key %}
 	<li>
@@ -18,9 +18,6 @@
 				  {% ifequal time.preference 2 %}Laat{% endifequal %}
 	</li>
 	{% endifequal %}
-	{% endfor %}
-	{% for day in guardian.day_preferences %}
-		<li>{{ day.day.date }}: {{ day.rank }}</li>
 	{% endfor %}
 	<ul>
 		{% for child in guardian.children %}
