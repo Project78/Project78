@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Requests</title>
+</head>
+
+<body>
+<h1>Testdata</h1>
+<p>Seed: 1138</p>
+
+voogdnummer ; leerlingnummer ; vakcode<br>
+{% for guardian in guardians %}
+{% for child in guardian.children %}
+{% for request in child.requests %}
+{{ guardian.key.name }} ; {{ child.key.name }} ; {{ request.combination.subject.key.name }}<br>
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+
+
+</body>
+</html>

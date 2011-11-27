@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Requests</title>
+</head>
+
+<body>
+<h1>Testdata</h1>
+<p>Seed: 1138</p>
+
+voogdnummer ; dagvoorkeur (1 is hoogste voorkeur) ; datum ; tijdvoorkeur (0 geen, 1 vroeg, 2 laat)<br>
+{% for guardian in guardians %}
+{% for time in guardian.time_preferences %}
+{% for day in guardian.day_preferences %}
+{{ guardian.key.name }} ; {{ day.rank }} ; {{ day.day.date }} ; {{ time.preference }}<br>
+{% endfor %}
+{% endfor %}
+{% endfor %}
+
+
+
+</body>
+</html>
