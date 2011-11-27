@@ -402,6 +402,8 @@ class PlanHandler(webapp.RequestHandler):
         return list(set(a) & set(b))
     
     
+=======
+>>>>>>> 75a6826a221ecba687df7adce4d458b7e470c905
     
 class bulkdelete(webapp.RequestHandler):
     def get(self):
@@ -419,6 +421,7 @@ class bulkdelete(webapp.RequestHandler):
                 except Exception, e:
                     self.response.out.write(repr(e)+'\n')
                     pass
+<<<<<<< HEAD
     
 class bulkdelete2(webapp.RequestHandler):
     def get(self):
@@ -437,6 +440,8 @@ class bulkdelete2(webapp.RequestHandler):
                     self.response.out.write(repr(e)+'\n')
                     pass
 
+=======
+>>>>>>> 75a6826a221ecba687df7adce4d458b7e470c905
         
 
 
