@@ -1,0 +1,44 @@
+1 1 2 3 5 8 13 21 34 55 89 144 233
+
+1	5
+2	8
+3	2
+4	5
+5	8
+6	8
+7	34
+8	5		niet belangrijk (hoog?)
+9	3		niet belangrijk (hoog?)
+10	5
+11	5
+12	8		niet belangrijk/PDF (hoog?)
+13	13
+14	5		handmatig aanpassen door administratie na telefonisch contact?
+15	3		handmatig aanpassen door administratie na telefonisch contact?
+16	8		niet belangrijk/PDF (hoog?)
+17	13		samen met 13?
+18	8
+19	3
+
+
+
+1	Als administratie wil ik ouderavond-reeksen beheren: eenvoudig
+2	Als administratie wil ik ouderavond-reeksen beheren: uitgebreid
+3	Als administratie wil ik uitnodigingen versturen naar voogden
+4	Als voogd wil ik voorkeur aangeven voor post of e-mail
+5	Als voogd wil ik (per schoolgaand kind) inschrijven op een ouderavond-reeks
+6	Als voogd wil ik inschrijvingen kunnen aanpassen (zolang inschrijving open is)
+7	Als administratie wil ik, aan de hand van inschrijvingen, een planning maken
+8	Als administratie wil ik, na de planning, handmatig gesprekken kunnen beheren
+9	Als administratie wil ik kunnen zoeken naar voogden en/of leerlingen
+10	Als adminstratie wil ik voogden de afspraken toe kunnen sturen
+11	Als administratie wil ik docenten het ouderavond-reeksen-rooster toe kunnen sturen
+12	Als voogd wil ik de geplande afspraken uit kunnen printen
+13	Als voogd wil ik de geplande afspraken als PDF kunnen downloaden
+14	Als voogd wil ik een afspraak kunnen verplaatsen
+15	Als voogd wil ik een afspraak kunnen afzeggen
+16	Als docent wil ik een ouderavond-reeks-rooster uit kunnen printen
+17	Als docent wil ik een ouderavond-reeks-rooster als PDF kunnen downloaden
+18	Als administratie wil ik middels cvs-bestanden data over voogden, leerlingen, docenten en vakken kunnen importeren
+19	Als gebruiker wil ik het lettertype van de interface kunnen aanpassen
+

@@ -16,16 +16,19 @@
 #
 
 import os
+import fnmatch
 import cgi
 import csv
 import datetime
 import math
 import random
+import time
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 from google.appengine.api.datastore import Key
+from google.appengine.ext import db
 
 from models.event import Event
 from models.day import Day
@@ -37,6 +40,8 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
+from handlers.newevent import NewEvent
+from handlers.editevent import EditEvent
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -111,44 +116,12 @@ class ListRegistrationsHandler(webapp.RequestHandler):
         }
         self.response.out.write(template.render(path, template_values))
 
-
-class AdministrationHandler(webapp.RequestHandler):
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-new.html')
-        template_values = {
-        }
-        self.response.out.write(template.render(path, template_values))
-    
-    def post(self):
-        a = self.request.POST['event-date']
-        a = [1, 2, 3, 4]
-        self.response.out.write("<table>")
-        for key, value in self.request.POST.iteritems():
-            self.response.out.write("<tr><td>" + key + "</td><td>" + value + "</td></tr>")
-        self.response.out.write("</table>")
-
 class EventHandler(webapp.RequestHandler):
     def get(self):
         events = Event.all()
-        days = []
-        for event in events:
-            retrievedDays = Day.gql("WHERE event = :1", event)
-            for day in retrievedDays:
-                hours = day.date.hour
-                minutes = day.date.minute
-                if day.talks != None:
-                    minutes += day.talks * event.talk_time
-                    
-                if minutes >= 60:
-                    hours += int(math.floor(minutes / 60))
-                    minutes %= 60
-                day.end_time = datetime.datetime(year=day.date.year, month=day.date.month, day=day.date.day, hour=hours, minute=minutes)
-                day.put()
-            days.extend(retrievedDays)
         path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
         template_values = {
-            'events': events,
-            'days': days         
+            'events': events      
         }
         self.response.out.write(template.render(path, template_values))
 
@@ -307,7 +280,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                       event=event)
         day.put()
         
-        guardians = Guardian.all().fetch(9999)
+        guardians = Guardian.all()
         for guardian in guardians:
             time = TimePreference()
             time.event = event
@@ -323,7 +296,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref.rank = i
                 day_pref.save()
             for child in guardian.children:
-                subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
+                subjects = Combination.all().filter('class_id', child.class_id).fetch(999)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
                 for choice in selection:
                     request = Request()
@@ -342,7 +315,23 @@ class DisplayRequestsHandler(webapp.RequestHandler):
             'guardians': Guardian.all().fetch(9999)
         }
         self.response.out.write(template.render(path, template_values))        
-        
+    
+class bulkdelete(webapp.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        path = "models"
+        dirList = os.listdir(path)
+        for fname in dirList:
+            if fnmatch.fnmatch(fname, '*.py') and not fnmatch.fnmatch(fname, '_*'):
+                try:
+                    while True:
+                        q = db.GqlQuery("SELECT __key__ FROM " + fname.capitalize().split('.')[0].replace('preference', 'Preference'))
+                        assert q.count()
+                        db.delete(q.fetch(200))
+                        time.sleep(0.5)
+                except Exception, e:
+                    self.response.out.write(repr(e)+'\n')
+                    pass
         
 
 def main():
@@ -354,7 +343,8 @@ def main():
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
-                                          ('/administratie/nieuw-event', AdministrationHandler)
+                                          ('/clear', bulkdelete),
+                                          ('/administratie/event/(nieuw|\d+)', EditEvent)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
