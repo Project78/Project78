@@ -286,7 +286,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
         random.seed(1138)
                 
         # Add an event
-        event = Event(name="paasrapport",
+        event = Event(event_name="paasrapport",
                       tables=40,
                       talk_time=15)
         event.put()
@@ -320,7 +320,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref = DayPreference()
                 day_pref.guardian = guardian
                 day_pref.day = day
-                day_pref.rank = i
+                day_pref.rank = i+1
                 day_pref.save()
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(9999)
@@ -338,12 +338,99 @@ class DisplayRequestsHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/requests.html')
         template_values = {
-            'event': Event.all().filter('event_name', 'paasrapport').fetch(1),
+            'event': Event.all().get(),
             'guardians': Guardian.all().fetch(9999)
         }
         self.response.out.write(template.render(path, template_values))        
+
+
+class DisplayTestHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'templates/testset.html')
+        template_values = {
+            'event': Event.all().get(),
+            'guardians': Guardian.all().fetch(9999)
+        }
+        self.response.out.write(template.render(path, template_values))        
+
+class DisplayStatsHandler(webapp.RequestHandler):
+    def get(self):
+        guardians = Guardian.all().fetch(9999)
+        geen = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        vroeg = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        laat = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for guardian in guardians:
+            if guardian.time_preferences.get().preference == 0:
+                geen[guardian.requests.count()] = geen[guardian.requests.count()]+1
+            if guardian.time_preferences.get().preference == 1:
+                vroeg[guardian.requests.count()] = vroeg[guardian.requests.count()]+1
+            if guardian.time_preferences.get().preference == 2:
+                laat[guardian.requests.count()] = laat[guardian.requests.count()]+1
         
+        print geen
+        print vroeg
+        print laat
         
+#        path = os.path.join(os.path.dirname(__file__), 'templates/stats.html')
+#        template_values = {
+#            'lijst': Event.all().get(),
+#            'guardians': Guardian.all().fetch(9999)
+#        }
+#        self.response.out.write(template.render(path, template_values))        
+
+class DisplayPrefsHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'templates/prefs.html')
+        template_values = {
+            'lijst': Event.all().get(),
+            'guardians': Guardian.all().fetch(9999)
+        }
+        self.response.out.write(template.render(path, template_values))        
+       
+
+class PlanHandler(webapp.RequestHandler):    
+    def get(self):
+        guardians = Guardian.all().fetch(10)
+        current_event = Event.all().filter("event_name", "paasrapport").get()
+        requests = Request.all().filter("event", current_event).fetch(9999)
+        days = Day.all().filter("event", current_event).fetch(100)
+        print days
+        max_rank = DayPreference.all().order('-rank').get().rank
+        print max_rank
+            
+        # build a dictionary defining request-sets of a specific lengths
+        lengths = {}
+        for guardian in guardians:
+            requests = guardian.requests.filter("event", current_event).fetch(guardian.requests.filter("event", current_event).count())
+            print requests
+            count = len(requests)
+            print count
+            if not count in lengths:
+                lengths[count] = [requests]
+                print "New length"
+            else:
+                lengths[count].append(requests)
+                print "Existing length"
+            
+        for length in sorted(lengths.items(), reverse=True):
+            for day in days:
+                
+                for my_requests in length[1]:
+                    print my_requests
+            
+        
+        # build a list of dictionaries defining request-sets based on preferred days
+        
+
+
+        
+
+#        event = Event.all().get()
+#        days = [day for day in event.days]
+
+    def intersect(self, a, b):
+        return list(set(a) & set(b))
+
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
@@ -353,6 +440,10 @@ def main():
                                           ('/init', InitDataHandler),
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/requests', DisplayRequestsHandler),
+                                          ('/test', DisplayTestHandler),
+                                          ('/stats', DisplayStatsHandler),
+                                          ('/prefs', DisplayPrefsHandler),
+                                          ('/plan', PlanHandler),
                                           ('/administratie', EventHandler),
                                           ('/administratie/nieuw-event', AdministrationHandler)
                                           ],
