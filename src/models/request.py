@@ -15,6 +15,6 @@ class Request(db.Model):
     A Request represents one subject about which a Guardian wants to talk
     '''
     event = db.ReferenceProperty(Event, collection_name="requests")
-    guardian = db.ReferenceProperty(Guardian, collection_name="requests")
+    guardian = db.ReferenceProperty(Guardian, collection_name="all_requests")
     student = db.ReferenceProperty(Student, collection_name="requests")
     combination = db.ReferenceProperty(Combination, collection_name="requests")

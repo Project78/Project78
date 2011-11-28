@@ -23,6 +23,7 @@ import datetime
 import math
 import random
 import time
+import copy
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -42,6 +43,7 @@ from models.combination import Combination
 from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
+from classes.planning_guardian import PlanGuardian
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -333,6 +335,43 @@ class bulkdelete(webapp.RequestHandler):
                     self.response.out.write(repr(e)+'\n')
                     pass
         
+class plan(webapp.RequestHandler):
+    def get(self):
+        event = Event.all().filter("event_name", "paasrapport").get()
+        days = Day.all().filter("event", event).fetch(999)
+        days.sort(key=lambda day: day.date)
+        max_requests = 0
+        max_rank = 0
+        for day in days:
+            print day.date.strftime("%d-%m-%y")
+        allguardians = Guardian.all().fetch(10)
+        guardians = []
+        requests = []
+        for guardian in allguardians:
+            requests = Request.all().filter("guardian", guardian).filter("event", event).fetch(999)
+            if len(requests) > 0:
+                max_requests = max([max_requests, len(requests)])
+                guardian.requests = requests
+                guardian.day_prefs = []
+                for day in days:
+                    guardian.day_prefs.append(DayPreference.all().filter("guardian", guardian).filter("day", day).get())
+                guardian.day_prefs.sort(key=lambda day: day.rank)
+                max_rank = max([max_rank, max([day.rank for day in guardian.day_prefs])])
+                guardian.time_pref = TimePreference.all().filter("guardian", guardian).filter("event", event).get()
+                guardians.append(guardian)
+        for guardian in guardians:
+            print guardian.title + guardian.lastname
+        
+        for length in range (max_requests, 0, -1):
+            print "Guardians with "+str(length)+" requests:"
+            for guardian in filter(lambda guardian: (len(guardian.requests) == length), guardians):
+                print guardian.lastname
+
+        
+                
+                
+                
+
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
@@ -341,6 +380,7 @@ def main():
                                           ('/fill', FillDatabaseHandler),
                                           ('/init', InitDataHandler),
                                           ('/generate', GenerateRandomEventHandler),
+                                          ('/plan', plan),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
