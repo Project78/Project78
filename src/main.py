@@ -364,8 +364,12 @@ class plan(webapp.RequestHandler):
         
         for length in range (max_requests, 0, -1):
             print "Guardians with "+str(length)+" requests:"
-            for guardian in filter(lambda guardian: (len(guardian.requests) == length), guardians):
-                print guardian.lastname
+            for day in days:
+                print day.date.strftime("%d-%m-%y")
+                for guardian in filter(lambda guardian: (len(guardian.requests) == length)
+                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
+                                   guardians):
+                    print guardian.lastname
 
         
                 
