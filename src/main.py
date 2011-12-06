@@ -262,7 +262,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
         random.seed(1138)
                 
         # Add an event
-        event = Event(name="paasrapport",
+        event = Event(event_name="paasrapport",
                       tables=40,
                       talk_time=15)
         event.put()
@@ -342,10 +342,11 @@ class plan(webapp.RequestHandler):
         days = Day.all().filter("event", event).fetch(999)
         days.sort(key=lambda day: day.date)
         max_requests = 0
+        max_timepref = 0
         max_rank = 0
         for day in days:
             print day.date.strftime("%d-%m-%y")
-        allguardians = Guardian.all().fetch(10)
+        allguardians = Guardian.all().fetch(20)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -359,14 +360,21 @@ class plan(webapp.RequestHandler):
                 guardian.day_prefs.sort(key=lambda day: day.rank)
                 max_rank = max([max_rank, max([day.rank for day in guardian.day_prefs])])
                 guardian.time_pref = TimePreference.all().filter("guardian", guardian).filter("event", event).get()
+                max_timepref = max([max_timepref, guardian.time_pref.preference])
+                print guardian.time_pref.preference;
                 guardians.append(guardian)
-        for guardian in guardians:
-            print guardian.title + guardian.lastname
+
+        timepref_options = range(max_timepref+1)
+        print timepref_options
         
-        for length in range (max_requests, 0, -1):
-            print "Guardians with "+str(length)+" requests:"
-            for guardian in filter(lambda guardian: (len(guardian.requests) == length), guardians):
-                print guardian.lastname
+#        for length in range (max_requests, 0, -1):
+#            print "Guardians with "+str(length)+" requests:"
+#            for day in days:
+#                print day.date.strftime("%d-%m-%y")
+#                for guardian in filter(lambda guardian: (len(guardian.requests) == length)
+#                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
+#                                   guardians):
+#                    print guardian.lastname
 
 class MailHandler(webapp.RequestHandler):
     def get(self):
