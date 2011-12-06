@@ -44,6 +44,7 @@ from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
 from classes.planning_guardian import PlanGuardian
+from classes.send_mail import Mail
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -367,7 +368,11 @@ class plan(webapp.RequestHandler):
             for guardian in filter(lambda guardian: (len(guardian.requests) == length), guardians):
                 print guardian.lastname
 
-        
+class MailHandler(webapp.RequestHandler):
+    def get(self):
+        mail = Mail()
+        mail.send()
+                 
                 
                 
                 
@@ -384,7 +389,8 @@ def main():
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
-                                          ('/administratie/event/(nieuw|\d+)', EditEvent)
+                                          ('/administratie/event/(nieuw|\d+)', EditEvent),
+                                          ('/mail', MailHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
