@@ -6,6 +6,7 @@ Created on Oct 12, 2011
 
 from google.appengine.ext import db
 from event import Event
+from datetime import timedelta
 
 class Day(db.Model):
     '''
@@ -15,4 +16,10 @@ class Day(db.Model):
     talks = db.IntegerProperty()
     event = db.ReferenceProperty(Event, collection_name="days")
     end_time = db.DateTimeProperty()
+    
+    def updateEndTime(self):
+        m = self.event.talk_time * self.talks
+        d = timedelta(minutes=m)
+        self.end_time = self.date + d
+    
     

@@ -7,6 +7,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from models.event import Event
 from models.day import Day
+from datetime import timedelta
+from copy import deepcopy
 
 class EditEvent(webapp.RequestHandler):
     
@@ -23,33 +25,29 @@ class EditEvent(webapp.RequestHandler):
                 'monthText': monthText         
             }
                         
-            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
             self.response.out.write(template.render(path, tV))
         
         #first call of new event
         elif arg == 'nieuw':
-            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
             self.response.out.write(template.render(path, {}))
             
             
     def post(self, arg):
-#        if self.request.POST['i-delete-event']:
-#            print 'delete'
         if self.request.POST['i-save-event']:
-            #check if ok
-            #collect erros
             n = self.request.POST['i-name']
             d = self.request.POST['i-startdate']
             v = Validator()
             errors = [];
-    
-    
+
+            #is it an existing event or not?    
             if arg.isdigit():
                 nE = Event.get_by_id(int(arg))
-                nD = Day.gql("WHERE event = :1", nE)[0]
+                nDs = Day.gql("WHERE event = :1", nE).fetch(3) 
             elif arg == 'nieuw':
                 nE = Event(tables=40, talk_time=15)
-                nD = Day(talks=12)
+                nDs = [Day(talks=12), Day(talks=12), Day(talks=12)]
             
             #validate data
             if not v.vString(n):
@@ -61,29 +59,47 @@ class EditEvent(webapp.RequestHandler):
             else:
                 d = map(int, (d.split('-')))
                 sD = datetime.datetime(year=d[0], month=d[1], day=d[2], hour=20, minute=00)
-                nD.date = sD
-    
+                nDs[0].date = sD
+                
             #show errors if they exist
             if errors:
-                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
+                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
                 monthText = ''
-                if nD.date:
-                    monthText = self.getMonthText(nD.date.month)
+                if nDs[0].date:
+                    monthText = self.getMonthText(nDs[0].date.month)
                 
                 tv = { 
                       'errors': errors,
                       'event': nE,
-                      'day': nD,
+                      'day': nDs[0],
                       'monthText': monthText  
                 }
                 self.response.out.write(template.render(path, tv))
+            
             #update event in datastore if no error exists
             else:
                 nE.put()
-                nD.event = nE
-                nD.put()
+                #add two other dates and store them
+                delta = datetime.timedelta(days=1)
+                print nDs[0].date.day
+                print nDs[0].date.weekday() 
+                if nDs[0].date.weekday() < 3:
+                    nDs[1].date = deepcopy(nDs[0].date) + delta
+                    nDs[2].date = deepcopy(nDs[0].date) + delta*2
+                elif nDs[0].date.weekday() == 3:
+                    nDs[1].date = deepcopy(nDs[0].date) + delta
+                    nDs[2].date = deepcopy(nDs[0].date) + delta*3
+                elif nDs[0].date.weekday() == 4:
+                    nDs[1].date = deepcopy(nDs[0].date) + delta*3
+                    nDs[2].date = deepcopy(nDs[0].date) + delta*4
+                    
+                for d in nDs:
+                    d.event = nE
+                    d.updateEndTime()
+                    d.put()
+                
                 self.redirect('/administratie')
-        
+    
     def getMonthText(self, i):
         return {
             1: 'januari',
