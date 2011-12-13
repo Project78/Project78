@@ -4,7 +4,7 @@ Created on Nov 27, 2011
 @author: averaart
 '''
 
-class PlanGuardian(object):
+class Planning(object):
     '''
     Collects all relevant data for an event for one guardian
     '''

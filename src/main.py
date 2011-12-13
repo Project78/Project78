@@ -43,7 +43,7 @@ from models.combination import Combination
 from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
-from classes.planning_guardian import PlanGuardian
+from classes.planning import Planning
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -343,9 +343,7 @@ class plan(webapp.RequestHandler):
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        for day in days:
-            print day.date.strftime("%d-%m-%y")
-        allguardians = Guardian.all().fetch(20)
+        allguardians = Guardian.all().fetch(10)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -360,20 +358,33 @@ class plan(webapp.RequestHandler):
                 max_rank = max([max_rank, max([day.rank for day in guardian.day_prefs])])
                 guardian.time_pref = TimePreference.all().filter("guardian", guardian).filter("event", event).get()
                 max_timepref = max([max_timepref, guardian.time_pref.preference])
-                print guardian.time_pref.preference;
                 guardians.append(guardian)
 
         timepref_options = range(max_timepref+1)
-        print timepref_options
+        print ""
+        timepref_options = [1,2,0]
         
-#        for length in range (max_requests, 0, -1):
-#            print "Guardians with "+str(length)+" requests:"
-#            for day in days:
-#                print day.date.strftime("%d-%m-%y")
-#                for guardian in filter(lambda guardian: (len(guardian.requests) == length)
-#                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
-#                                   guardians):
-#                    print guardian.lastname
+        planning={}
+        
+        
+        
+        
+        
+        for timepref in timepref_options:
+            print "Guardians with timepref: "+str(timepref)
+            for length in range (max_requests, 0, -1):
+                print "Guardians with "+str(length)+" requests:"
+                for rank in range(1, max_rank+2):
+                    print "With day as rank: "+str(rank)
+                    for day in days:
+                        for guardian in filter(lambda guardian: (len(guardian.requests) == length)
+                                           and (guardian.time_pref.preference == timepref) 
+                                           and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == rank),
+                                           guardians):
+                            print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten met:"
+                            for request in guardian.requests:
+                                print "    "+request.combination.teacher.name +" over "+ request.combination.subject.name
+
 
         
                 
