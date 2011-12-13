@@ -43,7 +43,12 @@ from models.combination import Combination
 from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
+<<<<<<< HEAD
 from classes.planning import Planning
+=======
+from handlers.mailevent import MailHandler
+from classes.planning_guardian import PlanGuardian
+>>>>>>> 8e4e4922c4896050e30193b1ab4aa5c5b67f2509
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -364,6 +369,7 @@ class plan(webapp.RequestHandler):
         print ""
         timepref_options = [1,2,0]
         
+<<<<<<< HEAD
         planning={}
         
         
@@ -389,6 +395,16 @@ class plan(webapp.RequestHandler):
         
                 
                 
+=======
+#        for length in range (max_requests, 0, -1):
+#            print "Guardians with "+str(length)+" requests:"
+#            for day in days:
+#                print day.date.strftime("%d-%m-%y")
+#                for guardian in filter(lambda guardian: (len(guardian.requests) == length)
+#                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
+#                                   guardians):
+#                    print guardian.lastname
+>>>>>>> 8e4e4922c4896050e30193b1ab4aa5c5b67f2509
                 
 
 
@@ -403,7 +419,8 @@ def main():
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
-                                          ('/administratie/event/(nieuw|\d+)', EditEvent)
+                                          ('/administratie/event/(nieuw|\d+)', EditEvent),
+                                          ('/mail', MailHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
