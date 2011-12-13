@@ -43,8 +43,8 @@ from models.combination import Combination
 from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
+from handlers.mailevent import MailHandler
 from classes.planning_guardian import PlanGuardian
-from classes.send_mail import Mail
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -375,14 +375,6 @@ class plan(webapp.RequestHandler):
 #                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
 #                                   guardians):
 #                    print guardian.lastname
-
-class MailHandler(webapp.RequestHandler):
-    def get(self):
-        mail = Mail()
-        mail.send()
-                 
-                
-                
                 
 
 
