@@ -3,8 +3,8 @@
 {% block content %}
 <div id="content">
 	<form id="event-form" method="post" action="">
-		Titel<br /><input type="text" name="i-title" /><br />
-		Bericht<br /><textarea name="i-text" cols="109" rows="10"></textarea><br />
+		Titel<br /><input type="text" name="i-title" value="{{title}}" /><br />
+		Bericht<br /><textarea name="i-text" cols="109" rows="10">{{text}}</textarea><br />
 		<input type="submit" name="i-send-mail" value="Verstuur" />
 	</form>
 </div>

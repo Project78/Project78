@@ -8,16 +8,23 @@ from google.appengine.api import mail
 from google.appengine.api import users
 
 class MailHandler(webapp.RequestHandler):
+    title = ''
+    text = ''
+    
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-mail.html')
-
-        self.response.out.write(template.render(path, {}))
+        
+        template_values = {
+            'title': self.title,
+            'text': self.text
+        }
+        self.response.out.write(template.render(path, template_values))
         
     def post(self):
         
         if self.request.POST['i-send-mail']:
-            title = self.request.POST['i-title']
-            text = self.response.POST['i-text']
+            self.title = self.request.POST['i-title']
+            self.text = self.request.POST['i-text']
             
             user = users.get_current_user()
             if user is None:
@@ -32,6 +39,8 @@ class MailHandler(webapp.RequestHandler):
             message = mail.EmailMessage()
             message.sender = user.email()
             message.to = to_addr
-            message.subject = title
-            message.body = text       
+            message.subject = self.title
+            message.body = self.text       
             message.Send()
+            
+            print 'title = ' + self.title + '\ntext = ' + self.text
