@@ -4,6 +4,7 @@ Created on Oct 12, 2011
 @author: averaart
 '''
 
+from datetime import timedelta
 from google.appengine.ext import db
 from event import Event
 from datetime import timedelta
@@ -22,4 +23,5 @@ class Day(db.Model):
         d = timedelta(minutes=m)
         self.end_time = self.date + d
     
-    
+    def end_time(self):
+        return self.date + timedelta(minutes = self.talks * self.event.talk_time)

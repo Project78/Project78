@@ -1,5 +1,4 @@
 import os
-import math
 import datetime
 import re
 
@@ -7,7 +6,6 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from models.event import Event
 from models.day import Day
-from datetime import timedelta
 from copy import deepcopy
 
 class EditEvent(webapp.RequestHandler):
@@ -81,8 +79,6 @@ class EditEvent(webapp.RequestHandler):
                 nE.put()
                 #add two other dates and store them
                 delta = datetime.timedelta(days=1)
-                print nDs[0].date.day
-                print nDs[0].date.weekday() 
                 if nDs[0].date.weekday() < 3:
                     nDs[1].date = deepcopy(nDs[0].date) + delta
                     nDs[2].date = deepcopy(nDs[0].date) + delta*2

@@ -24,7 +24,8 @@ function addInitialDatePickers(){
 	});
 	$.datepicker.setDefaults($.datepicker.regional['nl']);
 	$.datepicker.setDefaults({
-		dateFormat : 'dd MM yy'
+		dateFormat : 'dd MM yy',
+		beforeShowDay: $.datepicker.noWeekends
 	});			
 }
 
