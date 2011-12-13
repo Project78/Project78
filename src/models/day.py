@@ -18,3 +18,4 @@ class Day(db.Model):
     
     def end_time(self):
         return self.date + timedelta(minutes = self.talks * self.event.talk_time)
+    

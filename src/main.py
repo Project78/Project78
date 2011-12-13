@@ -366,12 +366,32 @@ class plan(webapp.RequestHandler):
         print ""
         timepref_options = [1,2,0]
         
-
-        planning={}
+        planning = Planning(event, days)
         
+#        for i, day in enumerate(planning.days):
+#            print "Day: "+(str)(i+1)
+#            for table in day:
+#                text = ""
+#                for slot in table:
+#                    if slot is None:
+#                        text += "0 "
+#                    else:
+#                        text += "1 "
+#                print text
         
+        day = planning.days[0]
+        day[0][0]=1
+        day[0][1]=1
+        day[0][2]=1
+        day[1][0]=1
+        day[1][1]=1
+        day[2][0]=1
+        day[2][1]=1
+        day[2][2]=1
+        day[2][3]=1
+        day[4][0]=1
         
-        
+        print [table.index(None) for table in day]
         
         for timepref in timepref_options:
             print "Guardians with timepref: "+str(timepref)
@@ -387,7 +407,7 @@ class plan(webapp.RequestHandler):
                             print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten met:"
                             for request in guardian.requests:
                                 print "    "+request.combination.teacher.name +" over "+ request.combination.subject.name
-
+                                
 
         
                 
