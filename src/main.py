@@ -47,6 +47,7 @@ from classes.planning import Planning
 from handlers.mailevent import MailHandler
 
 
+
 class IndexHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
@@ -400,8 +401,6 @@ class plan(webapp.RequestHandler):
 #                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
 #                                   guardians):
 #                    print guardian.lastname
-        
-
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
