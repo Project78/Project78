@@ -40,7 +40,7 @@
 			<input id="i-startdate" type="hidden" name="i-startdate" value="{% if day %}{{day.date.year}}-{{day.date.month}}-{{day.date.day}}{% endif %}" />
 			<input id="i-startdate-datepicker" type="text" value="{% if monthText %}{{day.date.day}} {{monthText}} {{day.date.year}}{% endif %}" />
 		</div>
-		<input type="submit" name="i-save-event" value="Opslaan" /><input type="submit" name="i-delete-event" value="Verwijderen" />
+		<input type="submit" name="i-save-event" value="Opslaan" />
 	</form>
 </div>
 {% endblock %}

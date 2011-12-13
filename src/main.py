@@ -121,7 +121,7 @@ class ListRegistrationsHandler(webapp.RequestHandler):
 class EventHandler(webapp.RequestHandler):
     def get(self):
         events = Event.all()
-        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-overview.html')
+        path = os.path.join(os.path.dirname(__file__), 'templates/administration/event-list.html')
         template_values = {
             'events': events      
         }

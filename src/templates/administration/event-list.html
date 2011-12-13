@@ -1,0 +1,25 @@
+{% extends "event-base.html" %}
+
+{% block content %}
+	<div id="content" class="clearfix">
+		<a id="new-event-button" href="/administratie/event/nieuw">Nieuwe ouderavond</a>
+		<h1>Overzicht ouderavondreeksen</h1>
+		<ul id="event-list">
+			{% for event in events %}
+			<li class="event-entry clearfix">
+				<div class="title">
+					<b><a href="/administratie/event/{{event.key.id}}">{{event.event_name}}</b></a><br />
+				</div>
+				<div class="dates">
+					<ul>
+						{% for day in event.days %}
+						<li>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>&nbsp;{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - {{day.end_time.hour}}:{{day.end_time.minute}}{% ifequal day.end_time.minute 0 %}0{% endifequal %}</li>
+						{% endfor %}	
+					</ul>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

@@ -25,12 +25,12 @@ class EditEvent(webapp.RequestHandler):
                 'monthText': monthText         
             }
                         
-            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
             self.response.out.write(template.render(path, tV))
         
         #first call of new event
         elif arg == 'nieuw':
-            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
             self.response.out.write(template.render(path, {}))
             
             
@@ -63,7 +63,7 @@ class EditEvent(webapp.RequestHandler):
                 
             #show errors if they exist
             if errors:
-                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.twig')
+                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
                 monthText = ''
                 if nDs[0].date:
                     monthText = self.getMonthText(nDs[0].date.month)
