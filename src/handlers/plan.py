@@ -48,51 +48,40 @@ class plan(webapp.RequestHandler):
         timepref_options = [1,2,0]
         
         planning = Planning(event, days)
-        
-#        for i, day in enumerate(planning.days):
-#            print "Day: "+(str)(i+1)
-#            for table in day:
-#                text = ""
-#                for slot in table:
-#                    if slot is None:
-#                        text += "0 "
-#                    else:
-#                        text += "1 "
-#                print text
-        
-        day = planning.days[0]
-        day[0][0]=1
-        day[0][1]=1
-        day[0][2]=1
-        day[1][0]=1
-        day[1][1]=1
-        day[2][0]=1
-        day[2][1]=1
-        day[2][2]=1
-        day[2][3]=1
-        day[4][0]=1
-        
-        print [table.index(None) for table in day]
-        
-        for timepref in timepref_options:
-            print "Guardians with timepref: "+str(timepref)
-            for length in range (max_requests, 0, -1):
-                print "Guardians with "+str(length)+" requests:"
+            
+        for length in range (max_requests, 0, -1):
+            for timepref in timepref_options:
                 for rank in range(1, max_rank+2):
-                    print "With day as rank: "+str(rank)
-                    for day in days:
+                    for day_num, day in enumerate(days):
                         for guardian in filter(lambda guardian: (len(guardian.requests) == length)
                                            and (guardian.time_pref.preference == timepref) 
                                            and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == rank),
                                            guardians):
-                            print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten met:"
-                            for request in guardian.requests:
-                                print "    "+request.combination.teacher.name +" over "+ request.combination.subject.name
+                            print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank)
+                            print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten over " + str(len(guardian.requests)) + " vakken"
                                 
+                            # try to place these requests     
+                            placed = planning.place(guardian, day_num)
+                            
+                            # on succes, remove guardian from guardian
+                            # on fail, the guardian will return on a less preferable round
+                            if (placed):
+                                guardians.remove(guardian)
+                            
+                            
+#        print [table.index(None) for table in day]
+#                
+        for i, day in enumerate(planning.days):
+            print "Day: "+(str)(i+1)
+            for table in day:
+                text = ""
+                for slot in table:
+                    if slot is None:
+                        text += "0 "
+                    else:
+                        text += "1 "
+                print text
 
-        
-                
-                
 
 #        for length in range (max_requests, 0, -1):
 #            print "Guardians with "+str(length)+" requests:"
