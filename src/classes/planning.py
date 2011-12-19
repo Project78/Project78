@@ -51,9 +51,9 @@ class Planning(object):
         for i, table in enumerate(day):
             if table.count(None) < length:
                 nextEmpty[i] = 999
-            
+        
         if min(nextEmpty) == 999:
-            return False    
+            return 999
             
         myTable = nextEmpty.index(min(nextEmpty))
         
@@ -69,7 +69,7 @@ class Planning(object):
             reversed = False
         
         nextTable = self.findNext(day_num, length, reversed)
-        if nextTable == False:
+        if nextTable == 999:
             return False
         
         nextTable = self.days[day_num][nextTable]

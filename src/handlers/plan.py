@@ -26,7 +26,7 @@ class plan(webapp.RequestHandler):
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        allguardians = Guardian.all().fetch(9999)
+        allguardians = Guardian.all().fetch(100)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -57,7 +57,7 @@ class plan(webapp.RequestHandler):
                                            and (guardian.time_pref.preference == timepref) 
                                            and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == rank),
                                            guardians):
-                            print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank) + " - guardian: " + guardian.initials +" "+ guardian.lastname
+                            print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank) + " guardian: "+guardian.title +" "+ guardian.lastname
                             # print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten over " + str(len(guardian.requests)) + " vakken"
                                 
                             # try to place these requests     
