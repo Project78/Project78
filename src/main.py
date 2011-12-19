@@ -41,7 +41,6 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
-from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
 from classes.planning import Planning
 from handlers.mailevent import MailHandler
