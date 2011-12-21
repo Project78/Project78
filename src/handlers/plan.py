@@ -26,7 +26,7 @@ class plan(webapp.RequestHandler):
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        allguardians = Guardian.all().fetch(100)
+        allguardians = Guardian.all().fetch(9999)
         guardians = []
         requests = []
         for guardian in allguardians:

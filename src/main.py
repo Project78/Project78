@@ -44,6 +44,7 @@ from models.request import Request
 from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
 from handlers.plan import plan
+from handlers.test import test
 from handlers.mailevent import MailHandler
 
 
@@ -345,6 +346,7 @@ def main():
                                           ('/init', InitDataHandler),
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/plan', plan),
+                                          ('/test', test),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
