@@ -22,24 +22,43 @@ from classes.planning import Planning
 class test(webapp.RequestHandler):
     def get(self):
         print ""
-        teachers = Teacher.all().fetch(999)
-        for i, teacher in enumerate(teachers):
-            combinations = Combination.all().filter("teacher", teacher).fetch(999)
-            requests = []
+        
+#        Overzicht van docenten met aantal vak/klas combinaties
+        
+#        teachers = Teacher.all().fetch(999)
+#        for i, teacher in enumerate(teachers):
+#            combinations = Combination.all().filter("teacher", teacher).fetch(999)
+#            requests = []
+#            for comb in combinations:
+#                requests += Request.all().filter("combination", comb).fetch(999)
+#                
+#            try:
+#                calc = len(requests)/len(combinations)
+#            except:
+#                calc = 0
+#            print str.ljust(str(i),3)+" "+\
+#                    str.ljust(str(teacher.key().name()), 7)+\
+#                    " - combinations: "+\
+#                    str.ljust(str(len(combinations)),5)+\
+#                    " - requests: "+\
+#                    str.ljust(str(len(requests)),5)+\
+#                    " - requests per combination: "+\
+#                    str.ljust(str(calc),5)
+
+
+        combinations = Combination.all().fetch(999)
+        klassen = [str(comb.class_id) for comb in combinations]
+        klassen = set(klassen)
+        klassen = list(klassen)
+        klassen.sort()
+        
+        for klas in klassen:
+            combinations = Combination.all().filter("class_id", klas).fetch(999)
+            print klas
             for comb in combinations:
-                requests += Request.all().filter("combination", comb).fetch(999)
-                
-            try:
-                calc = len(requests)/len(combinations)
-            except:
-                calc = 0
-            print str.ljust(str(i),3)+" "+\
-                    str.ljust(str(teacher.key().name()), 7)+\
-                    " - combinations: "+\
-                    str.ljust(str(len(combinations)),5)+\
-                    " - requests: "+\
-                    str.ljust(str(len(requests)),5)+\
-                    " - requests per combination: "+\
-                    str.ljust(str(calc),5)
+                print str.ljust(str(comb.subject.name), 20) +" "+ str(comb.teacher.key().name()) +" "+ str(comb.teacher.name) 
+            print ""
+
+
 
 
