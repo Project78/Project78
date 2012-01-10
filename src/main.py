@@ -311,6 +311,11 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                     request.combination = choice
                     request.save()
                     
+        # per ouder
+            # per kind
+                # uit alle vakken uit diens klas
+                # 0 tot 3 willekeurige vakken
+
                     
 class DisplayRequestsHandler(webapp.RequestHandler):
     def get(self):
