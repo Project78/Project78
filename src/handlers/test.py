@@ -5,7 +5,9 @@ Created on Dec 20, 2011
 '''
 
 
+from sets import Set
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from models.event import Event
 from models.day import Day
 from models.daypreference import DayPreference
@@ -46,18 +48,33 @@ class test(webapp.RequestHandler):
 #                    str.ljust(str(calc),5)
 
 
-        combinations = Combination.all().fetch(999)
-        klassen = [str(comb.class_id) for comb in combinations]
-        klassen = set(klassen)
-        klassen = list(klassen)
-        klassen.sort()
+        combinations = db.GqlQuery("SELECT * FROM Combination WHERE class_id >= :1 AND class_id < :2", "3", u"3" + u"\ufffd").fetch(9999)
         
-        for klas in klassen:
-            combinations = Combination.all().filter("class_id", klas).fetch(999)
-            print klas
-            for comb in combinations:
-                print str.ljust(str(comb.subject.name), 20) +" "+ str(comb.teacher.key().name()) +" "+ str(comb.teacher.name) 
-            print ""
+        combinations.extend(db.GqlQuery("SELECT * FROM Combination WHERE class_id >= :1 AND class_id < :2", "4", u"4" + u"\ufffd").fetch(9999))
+        
+        teachers = [];
+        
+        for comb in combinations:
+            teachers.append(comb.teacher.key().name())
+        
+        teachers = Set(teachers)
+        
+        for teacher in teachers:
+            print teacher
+            
+        
+        
+#        klassen = [str(comb.class_id) for comb in combinations]
+#        klassen = set(klassen)
+#        klassen = list(klassen)
+#        klassen.sort()
+#        
+#        for klas in klassen:
+#            combinations = Combination.all().filter("class_id", klas).fetch(999)
+#            print klas
+#            for comb in combinations:
+#                print str.ljust(str(comb.subject.name), 20) +" "+ str(comb.teacher.key().name()) +" "+ str(comb.teacher.name) 
+#            print ""
 
 
 
