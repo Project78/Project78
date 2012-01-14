@@ -8,6 +8,7 @@ Created on Dec 20, 2011
 from sets import Set
 from google.appengine.ext import webapp
 from google.appengine.ext import db
+from google.appengine.api.datastore import Key
 from models.event import Event
 from models.day import Day
 from models.daypreference import DayPreference
@@ -27,42 +28,30 @@ class test(webapp.RequestHandler):
         
 #        Overzicht van docenten met aantal vak/klas combinaties
         
-#        teachers = Teacher.all().fetch(999)
-#        for i, teacher in enumerate(teachers):
-#            combinations = Combination.all().filter("teacher", teacher).fetch(999)
-#            requests = []
-#            for comb in combinations:
-#                requests += Request.all().filter("combination", comb).fetch(999)
-#                
-#            try:
-#                calc = len(requests)/len(combinations)
-#            except:
-#                calc = 0
-#            print str.ljust(str(i),3)+" "+\
-#                    str.ljust(str(teacher.key().name()), 7)+\
-#                    " - combinations: "+\
-#                    str.ljust(str(len(combinations)),5)+\
-#                    " - requests: "+\
-#                    str.ljust(str(len(requests)),5)+\
-#                    " - requests per combination: "+\
-#                    str.ljust(str(calc),5)
+        teachers = Teacher.all().fetch(999)
+        for i, teacher in enumerate(teachers):
+            combinations = Combination.all().filter("teacher", teacher).fetch(999)
+            requests = []
+            for comb in combinations:
+                requests += Request.all().filter("combination", comb).fetch(999)
+                
+            try:
+                calc = len(requests)/len(combinations)
+            except:
+                calc = 0
+            print str.ljust(str(i),3)+" "+\
+                    str.ljust(str(teacher.key().name()), 7)+\
+                    " - combinations: "+\
+                    str.ljust(str(len(combinations)),5)+\
+                    " - requests: "+\
+                    str.ljust(str(len(requests)),5)+\
+                    " - requests per combination: "+\
+                    str.ljust(str(calc),5)
 
 
-        combinations = db.GqlQuery("SELECT * FROM Combination WHERE class_id >= :1 AND class_id < :2", "3", u"3" + u"\ufffd").fetch(9999)
-        
-        combinations.extend(db.GqlQuery("SELECT * FROM Combination WHERE class_id >= :1 AND class_id < :2", "4", u"4" + u"\ufffd").fetch(9999))
-        
-        teachers = [];
-        
-        for comb in combinations:
-            teachers.append(comb.teacher.key().name())
-        
-        teachers = Set(teachers)
-        
-        for teacher in teachers:
-            print teacher
-            
-        
+
+
+#        Alle klassen en diens vakken
         
 #        klassen = [str(comb.class_id) for comb in combinations]
 #        klassen = set(klassen)

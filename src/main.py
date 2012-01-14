@@ -45,6 +45,7 @@ from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
 from handlers.plan import plan
 from handlers.test import test
+from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
 
 
@@ -260,6 +261,52 @@ class InitDataHandler(webapp.RequestHandler):
 class GenerateRandomEventHandler(webapp.RequestHandler):
     def get(self):
         
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM DayPreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM TimePreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Request")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Day")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Event")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        
         # Set random seed
         random.seed(1138)
                 
@@ -302,7 +349,22 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref.save()
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(999)
+                slots = 0
+                for day in event.days:
+                    slots += day.talks
+                print ""
+                print slots
+                
+                temp = list(subjects)
+                
+                for comb in temp:
+                    
+                    print Request.all().filter("combination.teacher", comb.teacher).count(9999)
+                    if Request.all().filter("teacher", comb.teacher).count(9999) >= slots:
+                        print Request.all().filter("teacher", comb.teacher).count(9999)
+                        subjects.remove(comb)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
+                
                 for choice in selection:
                     request = Request()
                     request.event = event
@@ -311,10 +373,6 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                     request.combination = choice
                     request.save()
                     
-        # per ouder
-            # per kind
-                # uit alle vakken uit diens klas
-                # 0 tot 3 willekeurige vakken
 
                     
 class DisplayRequestsHandler(webapp.RequestHandler):
@@ -352,6 +410,7 @@ def main():
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/plan', plan),
                                           ('/test', test),
+                                          ('/fix', FixTeachers),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
