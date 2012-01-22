@@ -85,15 +85,19 @@ class Planning(object):
         sideways = zip(*day)
         slot = filter(lambda x: x != None, sideways[slotnumber])
         teachersInSlot = [table.combination.teacher.key().name() for table in slot]
-#        print teachersInSlot
         uniqueTeachers = set([table.combination.teacher.key().name() for table in slot])
-#        print uniqueTeachers
         countAppointments = [teachersInSlot.count(teacher) for teacher in uniqueTeachers]
-#        print countAppointments
         conflicted = []
         for i, teacher in enumerate(uniqueTeachers):
             if countAppointments[i] > 1:
                 conflicted.append(teacher)
+
+#        print "conflictedTeachers called for slot "+str(slotnumber)
+#        print "all teachers in slot: "+str(teachersInSlot)
+#        print "unique teachers in slot: "+str(uniqueTeachers)
+#        print "number of appointments per unique teacher: "+str(countAppointments)
+#        print ""
+
         
         return conflicted
     
@@ -105,6 +109,12 @@ class Planning(object):
                 return ""
             else:
                 return request.combination.teacher.key().name()
+
+    def getMoveCounter(self, request):
+            if request == None:
+                return 0
+            else:
+                return request.moveCounter
 
     def pprint(self):
         for i, day in enumerate(self.days):
