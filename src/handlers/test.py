@@ -26,28 +26,28 @@ class test(webapp.RequestHandler):
     def get(self):
         print ""
         
+        
 #        Overzicht van docenten met aantal vak/klas combinaties
         
-        teachers = Teacher.all().fetch(999)
-        for i, teacher in enumerate(teachers):
-            combinations = Combination.all().filter("teacher", teacher).fetch(999)
-            requests = []
-            for comb in combinations:
-                requests += Request.all().filter("combination", comb).fetch(999)
-                
-            try:
-                calc = len(requests)/len(combinations)
-            except:
-                calc = 0
-            print str.ljust(str(i),3)+" "+\
-                    str.ljust(str(teacher.key().name()), 7)+\
-                    " - combinations: "+\
-                    str.ljust(str(len(combinations)),5)+\
-                    " - requests: "+\
-                    str.ljust(str(len(requests)),5)+\
-                    " - requests per combination: "+\
-                    str.ljust(str(calc),5)
-
+#        teachers = Teacher.all().fetch(999)
+#        for i, teacher in enumerate(teachers):
+#            combinations = Combination.all().filter("teacher", teacher).fetch(999)
+#            requests = []
+#            for comb in combinations:
+#                requests += Request.all().filter("combination", comb).fetch(999)
+#                
+#            try:
+#                calc = len(requests)/len(combinations)
+#            except:
+#                calc = 0
+#            print str.ljust(str(i),3)+" "+\
+#                    str.ljust(str(teacher.key().name()), 7)+\
+#                    " - combinations: "+\
+#                    str.ljust(str(len(combinations)),5)+\
+#                    " - requests: "+\
+#                    str.ljust(str(len(requests)),5)+\
+#                    " - requests per combination: "+\
+#                    str.ljust(str(calc),5)
 
 
 

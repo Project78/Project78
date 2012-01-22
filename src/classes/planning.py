@@ -128,3 +128,14 @@ class Planning(object):
                         text += str.ljust(str(slot.guardian.key().name())+":"+str(slot.combination.teacher.key().name()), 12)
                 print text
         print ""
+
+    def pprint_day(self, day):
+        for table in day:
+            text = ""
+            for slot in table:
+                if slot is None:
+                    text += str.ljust("-", 12)
+                else:
+                    text += str.ljust(str(slot.guardian.key().name())+":"+str(slot.combination.teacher.key().name()), 12)
+            print text
+        print ""
