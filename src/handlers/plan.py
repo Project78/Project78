@@ -67,21 +67,33 @@ class plan(webapp.RequestHandler):
                             # on fail, the guardian will return on a less preferable round
                             if (placed):
                                 guardians.remove(guardian)
-            
-                        
-                            
-        for i, day in enumerate(planning.days):
-            print "Day: "+(str)(i+1)
-            for table in day:
-                text = ""
-                for slot in table:
-                    if slot is None:
-                        text += str.ljust("-", 7)
-                    else:
-                        text += str.ljust(str(slot.combination.teacher.key().name()), 7)
-                print text
+
+#        planning.pprint()
+        planning.days[0][0][1], planning.days[0][0][3] = planning.days[0][0][3], planning.days[0][0][1]
+        planning.pprint()
+        
+        day = planning.days[0]   
+        for i, slot in enumerate(planning.flipped(day)):
+            conflicted = planning.conflictedTeachers(day, i)
+            print conflicted
+            while(conflicted):
+                teachers = map(planning.getTeacherStringFromRequest, planning.flipped(day)[i])
+                print "all teachers in slot "+str(i)+": "+str(teachers)
+                print "conflicted teacher: " +str(conflicted[0])
+                index = teachers.index(conflicted[0])
+                print "table position of conflicted teacher in slot: "+str(index)
+                if i == len(day[0])-1:
+                    i-=1 
+                day[index][i], day[index][i+1] = day[index][i+1], day[index][i]
+                day[index][i].moveCounter += 1
+                day[index][i+1].moveCounter += 1
+                conflicted = planning.conflictedTeachers(planning.days[0], i)
+                print ""
+                planning.pprint()
 
 
+
+        
 #        for length in range (max_requests, 0, -1):
 #            print "Guardians with "+str(length)+" requests:"
 #            for day in days:

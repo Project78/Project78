@@ -70,6 +70,7 @@ class Planning(object):
             
         for requestIndex, tableIndex in enumerate(range(startingIndex, startingIndex+length)):
             nextTable[tableIndex] = guardian.requests[requestIndex]
+            nextTable[tableIndex].moveCounter=0
         
         return True
         
@@ -80,4 +81,40 @@ class Planning(object):
             result = 999
         return result
 
+    def conflictedTeachers(self, day, slotnumber):
+        sideways = zip(*day)
+        slot = filter(lambda x: x != None, sideways[slotnumber])
+        teachersInSlot = [table.combination.teacher.key().name() for table in slot]
+#        print teachersInSlot
+        uniqueTeachers = set([table.combination.teacher.key().name() for table in slot])
+#        print uniqueTeachers
+        countAppointments = [teachersInSlot.count(teacher) for teacher in uniqueTeachers]
+#        print countAppointments
+        conflicted = []
+        for i, teacher in enumerate(uniqueTeachers):
+            if countAppointments[i] > 1:
+                conflicted.append(teacher)
+        
+        return conflicted
+    
+    def flipped(self, day):
+        return zip(*day)
 
+    def getTeacherStringFromRequest(self, request):
+            if request == None:
+                return ""
+            else:
+                return request.combination.teacher.key().name()
+
+    def pprint(self):
+        for i, day in enumerate(self.days):
+            print "Day: "+(str)(i+1)
+            for table in day:
+                text = ""
+                for slot in table:
+                    if slot is None:
+                        text += str.ljust("-", 12)
+                    else:
+                        text += str.ljust(str(slot.guardian.key().name())+":"+str(slot.combination.teacher.key().name()), 12)
+                print text
+        print ""
