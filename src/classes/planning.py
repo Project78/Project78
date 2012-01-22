@@ -92,7 +92,7 @@ class Planning(object):
             if countAppointments[i] > 1:
                 conflicted.append(teacher)
 
-#        print "conflictedTeachers called for slot "+str(slotnumber)
+        print "conflictedTeachers called for slot "+str(slotnumber)
 #        print "all teachers in slot: "+str(teachersInSlot)
 #        print "unique teachers in slot: "+str(uniqueTeachers)
 #        print "number of appointments per unique teacher: "+str(countAppointments)

@@ -73,10 +73,13 @@ class plan(webapp.RequestHandler):
         planning.pprint()
         
         for day in planning.days:
-            for i, slot in enumerate(planning.flipped(day)):
+            i = 0
+            while i<len(planning.flipped(day)):
+                slot = planning.flipped(day)[i]
+#            for i, slot in enumerate(planning.flipped(day)):
                 conflicted = planning.conflictedTeachers(day, i)
-                print conflicted
                 while(conflicted):
+                    print conflicted
                     teachers = map(planning.getTeacherStringFromRequest, planning.flipped(day)[i])
                     moveCounters = map(planning.getMoveCounter, planning.flipped(day)[i])
                     # all indices with the conflicted teacher
@@ -85,7 +88,7 @@ class plan(webapp.RequestHandler):
                     lowestMoveCounter = min(teacherMoveCounters)
                     lowestMoveCounterIndex = teacherMoveCounters.index(lowestMoveCounter)
                     index = indices[lowestMoveCounterIndex]
-                    if i == len(day[0])-1:
+                    if i == len(planning.flipped(day))-1:
                         i-=1
                         
     #                print "all teachers in slot "+str(i)+": "+str(teachers)
@@ -99,8 +102,11 @@ class plan(webapp.RequestHandler):
                     day[index][i], day[index][i+1] = day[index][i+1], day[index][i]
                     day[index][i].moveCounter += 1
                     day[index][i+1].moveCounter += 1
-                    conflicted = planning.conflictedTeachers(day, i)
                     planning.pprint()
+                    conflicted = planning.conflictedTeachers(day, i)
+
+                i+=1
+                
 
 
 
