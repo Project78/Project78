@@ -30,15 +30,6 @@ class Planning(object):
                 tables.append(slots)
             self.days.append(tables)    
                     
-#                    
-#            slots=[]
-#            for i in range(day.talks):
-#                tables=[]
-#                for j in range(event.tables):
-#                    tables.append(None)
-#                slots.append(tables)
-#            self.days.append(slots)
-
     def findNext(self, day_num, length, reversed):
         day = self.days[day_num]
         if (reversed):
@@ -59,7 +50,6 @@ class Planning(object):
         
         return myTable
         
-        
     def place(self, guardian, day_num):
         length = len(guardian.requests)
         
@@ -79,7 +69,7 @@ class Planning(object):
             startingIndex = nextTable.index(None)
             
         for requestIndex, tableIndex in enumerate(range(startingIndex, startingIndex+length)):
-            nextTable[tableIndex] = guardian.requests[requestIndex].combination.teacher.key().name()
+            nextTable[tableIndex] = guardian.requests[requestIndex]
         
         return True
         
@@ -89,3 +79,5 @@ class Planning(object):
         except:
             result = 999
         return result
+
+

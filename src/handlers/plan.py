@@ -51,13 +51,13 @@ class plan(webapp.RequestHandler):
             
         for length in range (max_requests, 0, -1):
             for timepref in timepref_options:
-                for rank in range(1, max_rank+2):
+                for rank in range(0, max_rank+1):
                     for day_num, day in enumerate(days):
                         for guardian in filter(lambda guardian: (len(guardian.requests) == length)
                                            and (guardian.time_pref.preference == timepref) 
                                            and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == rank),
                                            guardians):
-                            print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank) + " guardian: "+guardian.title +" "+ guardian.lastname
+                            # print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank) + " guardian: "+guardian.title +" "+ guardian.lastname
                             # print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten over " + str(len(guardian.requests)) + " vakken"
                                 
                             # try to place these requests     
@@ -67,10 +67,9 @@ class plan(webapp.RequestHandler):
                             # on fail, the guardian will return on a less preferable round
                             if (placed):
                                 guardians.remove(guardian)
+            
+                        
                             
-                            
-#        print [table.index(None) for table in day]
-#                
         for i, day in enumerate(planning.days):
             print "Day: "+(str)(i+1)
             for table in day:
@@ -79,7 +78,7 @@ class plan(webapp.RequestHandler):
                     if slot is None:
                         text += str.ljust("-", 7)
                     else:
-                        text += str.ljust(str(slot), 7)
+                        text += str.ljust(str(slot.combination.teacher.key().name()), 7)
                 print text
 
 
