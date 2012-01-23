@@ -4,6 +4,8 @@ Created on Nov 27, 2011
 @author: averaart
 '''
 
+import random
+
 for n,m in ( ('reverse(o)','n.reverse()'),('sort(o)','n.sort()'),\
                 ('extend(o,o1)','n.extend(o1)')): exec "def %s:\n t=type\n to=t(o)\
                 \n if to in (t(''),t(())): n=list(o)\n else: n=to(o)\n %s\n return n and\
@@ -92,7 +94,7 @@ class Planning(object):
             if countAppointments[i] > 1:
                 conflicted.append(teacher)
 
-        print "conflictedTeachers called for slot "+str(slotnumber)
+#        print "conflictedTeachers called for slot "+str(slotnumber)
 #        print "all teachers in slot: "+str(teachersInSlot)
 #        print "unique teachers in slot: "+str(uniqueTeachers)
 #        print "number of appointments per unique teacher: "+str(countAppointments)
@@ -139,3 +141,34 @@ class Planning(object):
                     text += str.ljust(str(slot.guardian.key().name())+":"+str(slot.combination.teacher.key().name()), 12)
             print text
         print ""
+        
+    def outputHTML(self):
+        lb = "\n"
+        tab = "    "
+        result = ""
+        result += "<html><body>"
+        for i, day in enumerate(self.days):
+            result += "Day: "+(str)(i+1)+lb
+            result += "<table>"+lb
+            for table in day:
+                result += "<tr>"+lb+tab
+                for slot in table:
+                    if slot is None:
+                        result += "<td>"
+                        result += str.ljust("-", 12)
+                    else:
+                        random.seed(int(slot.guardian.key().name()))
+                        r = random.randint(0, 255)
+                        g = random.randint(0, 255)
+                        b = random.randint(0, 255)
+                        if r+b+g > 383:
+                            t = 0
+                        else:
+                            t = 255
+                        result += "<td style='padding: 5px; background: rgb("+str(r)+","+str(g)+","+str(b)+"); color: rgb("+str(t)+","+str(t)+","+str(t)+")'>"
+                        result += str(slot.combination.teacher.key().name())
+                    result += "</td> "
+                result += "</tr>"+lb
+            result += "</table>"+lb
+        result +="</body></html>"
+        print result

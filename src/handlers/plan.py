@@ -70,19 +70,16 @@ class plan(webapp.RequestHandler):
 
 #        planning.pprint()
 #        planning.days[0][0][1], planning.days[0][0][3] = planning.days[0][0][3], planning.days[0][0][1]
-        planning.pprint()
+#        planning.pprint()
         
-#        for dayIndex, day in enumerate(planning.days):
-        if (True):
-            day = planning.days[2]
+        for dayIndex, day in enumerate(planning.days):
             i = 0
-            safetyCounter = 0
-#            while i<len(planning.flipped(day)):
-            while i<12:
+            direction = 1
+            while 0 <= i < len(planning.flipped(day)):
                 slot = planning.flipped(day)[i]
                 conflicted = planning.conflictedTeachers(day, i)
                 while(conflicted):
-                    print conflicted
+#                    print conflicted
                     teachers = map(planning.getTeacherStringFromRequest, planning.flipped(day)[i])
                     moveCounters = map(planning.getMoveCounter, planning.flipped(day)[i])
                     # all indices with the conflicted teacher
@@ -92,30 +89,29 @@ class plan(webapp.RequestHandler):
                     lowestMoveCounterIndex = teacherMoveCounters.index(lowestMoveCounter)
                     index = indices[lowestMoveCounterIndex]
                     if i == len(planning.flipped(day))-1:
-                        i-=1
+                        direction = -1
                         
-                    print "all teachers in slot "+str(i)+": "+str(teachers)
-                    print "respective moveCounters: "+str(moveCounters)
-                    print "conflicted teacher: " +str(conflicted[0])
-                    print "indices of the current conflicted teacher: "+ str(indices)
-                    print "moveCounters for current conflicted teacher: "+str(teacherMoveCounters)
-                    print "lowest moveCounter for current conflicted teacher: "+str(lowestMoveCounter)
-                    print "table position of conflicted teacher in slot: "+str(index)
+#                    print "all teachers in slot "+str(i)+": "+str(teachers)
+#                    print "respective moveCounters: "+str(moveCounters)
+#                    print "conflicted teacher: " +str(conflicted[0])
+#                    print "indices of the current conflicted teacher: "+ str(indices)
+#                    print "moveCounters for current conflicted teacher: "+str(teacherMoveCounters)
+#                    print "lowest moveCounter for current conflicted teacher: "+str(lowestMoveCounter)
+#                    print "table position of conflicted teacher in slot: "+str(index)
                                             
-                    day[index][i], day[index][i+1] = day[index][i+1], day[index][i]
+                    day[index][i], day[index][i+direction] = day[index][i+direction], day[index][i]
                     if day[index][i] != None:
                         day[index][i].moveCounter += 1
-                    if day[index][i+1] != None:
-                        day[index][i+1].moveCounter += 1
+                    if day[index][i+direction] != None:
+                        day[index][i+direction].moveCounter += 1
 #                    print "Day: "+str(dayIndex+1)
-                    planning.pprint_day(day)
+#                    planning.pprint_day(day)
                     conflicted = planning.conflictedTeachers(day, i)
 
-                i+=1
-                safetyCounter += 1
-                if safetyCounter > 50:
-                    break
-                
+                i+=direction
+                        
+        planning.outputHTML()
+        
 #        myDay = []
 #        
 #        for table in planning.days[2]:
