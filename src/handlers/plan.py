@@ -67,10 +67,14 @@ class plan(webapp.RequestHandler):
                             # on fail, the guardian will return on a less preferable round
                             if (placed):
                                 guardians.remove(guardian)
+                                planning.outputHTML()
+                                
 
 #        planning.pprint()
 #        planning.days[0][0][1], planning.days[0][0][3] = planning.days[0][0][3], planning.days[0][0][1]
 #        planning.pprint()
+        
+        
         
         for dayIndex, day in enumerate(planning.days):
             i = 0
@@ -107,10 +111,11 @@ class plan(webapp.RequestHandler):
 #                    print "Day: "+str(dayIndex+1)
 #                    planning.pprint_day(day)
                     conflicted = planning.conflictedTeachers(day, i)
+                    planning.outputHTML()
 
                 i+=direction
                         
-        planning.outputHTML()
+
         
 #        myDay = []
 #        

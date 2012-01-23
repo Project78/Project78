@@ -154,7 +154,7 @@ class Planning(object):
                 result += "<tr>"+lb+tab
                 for slot in table:
                     if slot is None:
-                        result += "<td>"
+                        result += "<td style='width: 75px; padding: 2px;'>"
                         result += str.ljust("-", 12)
                     else:
                         random.seed(int(slot.guardian.key().name()))
@@ -165,10 +165,11 @@ class Planning(object):
                             t = 0
                         else:
                             t = 255
-                        result += "<td style='padding: 5px; background: rgb("+str(r)+","+str(g)+","+str(b)+"); color: rgb("+str(t)+","+str(t)+","+str(t)+")'>"
+                        result += "<td style='width: 75px; text-align: center; padding: 2px; background: rgb("+str(r)+","+str(g)+","+str(b)+"); color: rgb("+str(t)+","+str(t)+","+str(t)+")'>"
                         result += str(slot.combination.teacher.key().name())
                     result += "</td> "
                 result += "</tr>"+lb
             result += "</table>"+lb
-        result +="</body></html>"
+        result +="</body></html>"+lb
+        result +="THIS_IS_A_SEPARATOR"+lb
         print result
