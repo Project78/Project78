@@ -13,5 +13,5 @@ class Combination(db.Model):
     Teacher-codes will be used as key_name
     '''
     class_id = db.StringProperty()
-    subject = db.ReferenceProperty(Subject, collection_name="teacher")
-    teacher = db.ReferenceProperty(Teacher, collection_name="subject")
+    subject = db.ReferenceProperty(Subject, collection_name="teachers")
+    teacher = db.ReferenceProperty(Teacher, collection_name="subjects")

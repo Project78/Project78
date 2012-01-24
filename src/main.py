@@ -43,6 +43,8 @@ from models.combination import Combination
 from models.request import Request
 from handlers.editevent import EditEvent
 from handlers.plan import plan
+from handlers.test import test
+from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
 from handlers.subscribe import Subscribe
 
@@ -255,16 +257,63 @@ class InitDataHandler(webapp.RequestHandler):
             new_combination.teacher=Teacher.all().filter("__key__ >=", Key.from_path('Teacher', row[2].strip())).get()
             new_combination.save()
             print "Combination " + str(new_combination.key().id_or_name()) + " stored"
+        self.redirect("/fix")
 
 class GenerateRandomEventHandler(webapp.RequestHandler):
     def get(self):
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM DayPreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM TimePreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Request")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Day")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Event")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
         
         # Set random seed
         random.seed(1138)
                 
         # Add an event
         event = Event(event_name="paasrapport",
-                      tables=40,
+                      tables=10,
                       talk_time=15)
         event.put()
 
@@ -284,7 +333,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                       event=event)
         day.put()
         
-        guardians = Guardian.all()
+        guardians = Guardian.all().fetch(100)
         for guardian in guardians:
             time = TimePreference()
             time.event = event
@@ -301,7 +350,22 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref.save()
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(999)
+#                slots = 0
+#                for day in event.days:
+#                    slots += day.talks
+#                print ""
+#                print slots
+#                
+#                print len(subjects)
+#                
+#                for comb in subjects:
+#                    if comb.teacher.isFull(event):
+#                        print "Leraar heeft al genoeg verzoeken."
+#                        subjects.remove(comb)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
+#                
+#                print len(subjects)
+                
                 for choice in selection:
                     request = Request()
                     request.event = event
@@ -310,6 +374,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                     request.combination = choice
                     request.save()
                     
+
                     
 class DisplayRequestsHandler(webapp.RequestHandler):
     def get(self):
@@ -346,6 +411,8 @@ def main():
                                           ('/init', InitDataHandler),
                                           ('/generate', GenerateRandomEventHandler),
                                           ('/plan', plan),
+                                          ('/test', test),
+                                          ('/fix', FixTeachers),
                                           ('/requests', DisplayRequestsHandler),
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
