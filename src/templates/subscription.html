@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>Inschrijvingen</title>
+</head>
+
+<body>
+<h1>Inschrijvingen</h1>
+<p>Hier komen gegevens van event, dagen, voogden, studenten .</p>
+
+
+{{event.event_name}}<br />
+
+
+{% for student in students %}
+	<h2>{{student.firstname}} {{student.preposition}} {{student.lastname}}</h2>
+	
+	<p>Kies hier welke vakken u wilt bespreken:</p>
+	<input type="checkbox" name="vehicle" value="Bike" />
+	
+{% endfor %}
+
+
+</body>
+
+</html>
