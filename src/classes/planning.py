@@ -55,6 +55,10 @@ class Planning(object):
     def place(self, guardian, day_num):
         length = len(guardian.requests)
         
+        for request in guardian.requests:
+            if self.appointmentsPerDay(day_num, request.combination.teacher.key().name()) >= len(self.days[day_num][0]):
+                return False
+        
         if guardian.time_pref.preference == 2:
             reversed = True
         else:
@@ -82,6 +86,7 @@ class Planning(object):
         except:
             result = 999
         return result
+
 
     def conflictedTeachers(self, day, slotnumber):
         sideways = zip(*day)
@@ -112,6 +117,13 @@ class Planning(object):
             else:
                 return request.combination.teacher.key().name()
 
+    def appointmentsPerDay(self, dayNum, teacher):
+        slots = []
+        for table in self.days[dayNum]:
+            for slot in table:
+                slots.append(self.getTeacherStringFromRequest(slot))
+        return slots.count(teacher)
+        
     def getMoveCounter(self, request):
             if request == None:
                 return 0
