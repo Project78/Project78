@@ -74,9 +74,11 @@ class Planning(object):
         else:
             startingIndex = nextTable.index(None)
             
-        for requestIndex, tableIndex in enumerate(range(startingIndex, startingIndex+length)):
-            nextTable[tableIndex] = guardian.requests[requestIndex]
-            nextTable[tableIndex].moveCounter=0
+        for requestIndex, slotIndex in enumerate(range(startingIndex, startingIndex+length)):
+            nextTable[slotIndex] = guardian.requests[requestIndex]
+            nextTable[slotIndex].moveCounter=0
+            nextTable[slotIndex].startingPosition=slotIndex
+            
         
         return True
         
@@ -89,6 +91,8 @@ class Planning(object):
 
 
     def conflictedTeachers(self, day, slotnumber):
+        if slotnumber > 11 or slotnumber < 0:
+            print "planning.conflictedTeachers - ontvangen slotnumber: "+str(slotnumber)+"<br>"
         sideways = zip(*day)
         slot = filter(lambda x: x != None, sideways[slotnumber])
         teachersInSlot = [table.combination.teacher.key().name() for table in slot]
@@ -130,6 +134,12 @@ class Planning(object):
             else:
                 return request.moveCounter
 
+    def getStartingPosition(self, request):
+            if request == None:
+                return 99999
+            else:
+                return request.startingPosition
+
     def pprint(self):
         for i, day in enumerate(self.days):
             print "Day: "+(str)(i+1)
@@ -158,10 +168,10 @@ class Planning(object):
         lb = "\n"
         tab = "    "
         result = ""
-        result += "<html><body>"
+#        result += "<html><body style='font-family: Helvetica; font-size: 0.8em;'>"
         for i, day in enumerate(self.days):
             result += "Day: "+(str)(i+1)+lb
-            result += "<table>"+lb
+            result += "<table style='font-size: 0.8em;'>"+lb
             for table in day:
                 result += "<tr>"+lb+tab
                 for slot in table:
@@ -178,10 +188,10 @@ class Planning(object):
                         else:
                             t = 255
                         result += "<td style='width: 75px; text-align: center; padding: 2px; background: rgb("+str(r)+","+str(g)+","+str(b)+"); color: rgb("+str(t)+","+str(t)+","+str(t)+")'>"
-                        result += str(slot.combination.teacher.key().name())
+                        result += str(slot.combination.teacher.key().name())+"<br>"+str(slot.guardian.key().name())
                     result += "</td> "
                 result += "</tr>"+lb
             result += "</table>"+lb
         result +="</body></html>"+lb
-        result +="THIS_IS_A_SEPARATOR"+lb
+#        result +="THIS_IS_A_SEPARATOR"+lb
         print result

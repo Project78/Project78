@@ -6,6 +6,7 @@ Created on Dec 18, 2011
 
 import time
 import random
+import math
 
 from google.appengine.ext import webapp
 from models.event import Event
@@ -24,7 +25,8 @@ from classes.planning import Planning
 class plan(webapp.RequestHandler):
     def get(self):
         
-#        print ""
+        print ""
+        print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
 #        print time.strftime("%H:%M:%S", time.localtime())+": Start"
         
         event = Event.all().filter("event_name", "paasrapport").get()
@@ -76,63 +78,62 @@ class plan(webapp.RequestHandler):
                             if (placed):
                                 guardians.remove(guardian)
                
-#        print time.strftime("%H:%M:%S", time.localtime())+": Schedule filled without regard for feasibility"
-                         
-#        planning.pprint_day(planning.days[0])
-
-        
-#        print planning.days
-#        for day in planning.days:
-#            print "Day: "+str(day)
-        
-        print ""
-        
+                
         for dayIndex, day in enumerate(planning.days):
-#            print len(day)
-#            print dayIndex
-#            print day[0]
-            safety = 0                                                      # general infinite loop preventer
+            safety = 0                                                      # <--- general infinite loop preventer
             slotNum = 0
             consecutiveCleanUps = 0
-#            print "consecutiveCleanUps set to zero at line 89"
             direction = 1
             
             # Perform until all slots have been cleaned in one go
             while consecutiveCleanUps < len(planning.flipped(day)):
+                print "Working on slot index: "+str(slotNum) +"<br>"
+                print "consecutiveCleanUps: " + str(consecutiveCleanUps) +"<br>"
+                print "direction: "+str(direction) +"<br>"
+                print  "<br>"
                 
-                conflictSafety = 0                                          # slot infinite loop preventer
+                conflictSafety = 0                                          # <--- slot infinite loop preventer
                 slot = planning.flipped(day)[slotNum]
                 conflicted = planning.conflictedTeachers(day, slotNum)
+
                 while(conflicted):
-#                    print conflicted
                     teachers = map(planning.getTeacherStringFromRequest, planning.flipped(day)[slotNum])
                     moveCounters = map(planning.getMoveCounter, planning.flipped(day)[slotNum])
+
                     # all indices with the conflicted teacher
                     indices = [j for j, x in enumerate(teachers) if x == conflicted[0]]
-                    teacherMoveCounters = [moveCounters[x] for x in indices]
+                    
+                    # find occurrences of teacher closest to startingPosition
+                    allStartingPositions = map(planning.getStartingPosition, slot)
+                    
+                    teacherDistances = []
+                    for index in indices:
+                        teacherDistances.append(slotNum-allStartingPositions[index])
+                                            
+                    if direction > 0:
+                        mostFavorableDistance = min(teacherDistances)
+                    else:
+                        mostFavorableDistance = max(teacherDistances)
+                    
+                    smallestDistanceIndices = [index for enum, index in enumerate(indices) if teacherDistances[enum] == mostFavorableDistance]
+                    
+                    # search for the occurrence of teacher with lowest moveCounter
+                    teacherMoveCounters = [moveCounters[x] for x in smallestDistanceIndices]
                     lowestMoveCounter = min(teacherMoveCounters)
                     lowestMoveCounterIndex = teacherMoveCounters.index(lowestMoveCounter)
                     index = indices[lowestMoveCounterIndex]
                     
                     # If the end is reached and there are still conflicts, start moving backwards
-                    if slotNum == len(planning.flipped(day))-1:
+                    if slotNum >= len(planning.flipped(day))-1:
                         direction = -1
                         consecutiveCleanUps = 0
-#                        print "consecutiveCleanUps set to zero at line 112"
+                        print "I'm working on slot index "+str(slotNum)+" and I've set direction to "+str(direction) +"<br>"
                     # If the start is reached and there are still conflicts, start moving forwards    
-                    if slotNum == 0:
+                    if slotNum <= 0:
                         direction = 1
                         consecutiveCleanUps = 0
-#                        print "consecutiveCleanUps set to zero at line 117"
+                        print "I'm working on slot index "+str(slotNum)+" and I've set direction to "+str(direction) +"<br>"
                       
-#                    print "all teachers in slot "+str(slotNum)+": "+str(teachers)
-#                    print "respective moveCounters: "+str(moveCounters)
-#                    print "conflicted teacher: " +str(conflicted[0])
-#                    print "indices of the current conflicted teacher: "+ str(indices)
-#                    print "moveCounters for current conflicted teacher: "+str(teacherMoveCounters)
-#                    print "lowest moveCounter for current conflicted teacher: "+str(lowestMoveCounter)
-#                    print "table position of conflicted teacher in slot: "+str(index)
-                                            
                     day[index][slotNum], day[index][slotNum+direction] = day[index][slotNum+direction], day[index][slotNum]
                     if day[index][slotNum] != None:
                         day[index][slotNum].moveCounter += 1
@@ -140,53 +141,48 @@ class plan(webapp.RequestHandler):
                         day[index][slotNum+direction].moveCounter += 1
                     
                     conflicted = planning.conflictedTeachers(day, slotNum)
-                    
-                    safety += 1
-                    if safety > 2500:
-#                        print "Broke during a slot"
-                        break
-                    
                     conflictSafety += 1
                     
                     # If solving takes too long, approach from the other direction
-                    if conflictSafety > 500:
-#                        print time.strftime("%H:%M:%S", time.localtime())+": Slot "+str(slotNum+1)+" is locking up; changing direction: "
-                        if direction == 1:
-                            direction = -1
-                            slotNum = random.randrange(slotNum+1, len(planning.flipped(day))+1)
-                        else:
-                            direction = 1
-                            slotNum = random.randrange(-1, slotNum)
+                    if conflictSafety > 25:
+                        slotNum = random.randrange(-1, len(planning.flipped(day)))
+                        if slotNum < 0:
+                            slotNum = 0
+#                        if slotNum == 0:
+#                            direction = 1
+#                        elif slotNum == (len(planning.flipped(day))-1):
+#                            direction = -1
+#                        else:
+#                            direction *= -1
+                        
                         consecutiveCleanUps = -1
-#                        print "consecutiveCleanUps set to minus one at line 152"
-                        conflictSafety = -1
+                        print "Conflict list seems to be hanging. Switching!<br>"
+                        conflictSafety = 0
                         break
-
-#                print ""
-#                print "Day: "+str(dayIndex+1)
-#                planning.pprint_day(day)
-#                print ""
-#                if slotNum == -1 or slotNum == len(planning.flipped(day)):
-#                    print ""
-#                else:
-#                    print time.strftime("%H:%M:%S", time.localtime())+": Slot "+str(slotNum+1)+" has been cleaned up"
+                
+                # <--- End of while(conflicted) loop
+                
+                
                 consecutiveCleanUps += 1 
                 slotNum+=direction
-#                if slotNum >= len(planning.flipped(day)):
-#                    slotNum = len(planning.flipped(day))-1
-#                    consecutiveCleanUps = 0
-#                    print "consecutiveCleanUps set to zero at line 169"
-#                if slotNum < 0:
-#                    slotNum = 0
-#                    consecutiveCleanUps = 0
-#                    print "consecutiveCleanUps set to zero at line 173"
+                if slotNum >= len(planning.flipped(day)):
+                    slotNum = len(planning.flipped(day))-1
+                    direction = -1
+                    consecutiveCleanUps = 0
+                    print "consecutiveCleanUps set to zero at line 202<br>"
+                if slotNum < 0:
+                    slotNum = 0
+                    direction = 1
+                    consecutiveCleanUps = 0
+                    print "consecutiveCleanUps set to zero at line 207<br>"
                 safety +=1
-                if safety > 10000:
-                    print "Broke after a slot finished"
+                if safety > 1000:
+                    print "LOOP?!?<br>"
                     break
-#                print "safety: "+str(safety)
-#                print "consecutiveCleanUps: "+str(consecutiveCleanUps)
-            print ""
+                
+            # <--- End of while consecutiveCleanUps < len(planning.flipped(day)) loop 
+            
+
         planning.outputHTML()
         
 #        for day in planning.days:
