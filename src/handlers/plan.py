@@ -81,8 +81,16 @@ class plan(webapp.RequestHandler):
 #        planning.pprint_day(planning.days[0])
 
         
+#        print planning.days
+#        for day in planning.days:
+#            print "Day: "+str(day)
         
-        for dayIndex, day in enumerate([planning.days[0]]):
+        print ""
+        
+        for dayIndex, day in enumerate(planning.days):
+#            print len(day)
+#            print dayIndex
+#            print day[0]
             safety = 0                                                      # general infinite loop preventer
             slotNum = 0
             consecutiveCleanUps = 0
@@ -142,7 +150,7 @@ class plan(webapp.RequestHandler):
                     
                     # If solving takes too long, approach from the other direction
                     if conflictSafety > 500:
-                        print time.strftime("%H:%M:%S", time.localtime())+": Slot "+str(slotNum+1)+" is locking up; changing direction: "
+#                        print time.strftime("%H:%M:%S", time.localtime())+": Slot "+str(slotNum+1)+" is locking up; changing direction: "
                         if direction == 1:
                             direction = -1
                             slotNum = random.randrange(slotNum+1, len(planning.flipped(day))+1)
@@ -174,14 +182,12 @@ class plan(webapp.RequestHandler):
 #                    print "consecutiveCleanUps set to zero at line 173"
                 safety +=1
                 if safety > 10000:
-#                    print "Broke after a slot finished"
+                    print "Broke after a slot finished"
                     break
 #                print "safety: "+str(safety)
 #                print "consecutiveCleanUps: "+str(consecutiveCleanUps)
-                
-                       
+            print ""
         planning.outputHTML()
-
         
 #        for day in planning.days:
 #            myDay = []
