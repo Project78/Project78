@@ -204,3 +204,28 @@ th
 	font-size: 19px;
 	text-decoration: none;
 }
+
+/**/
+.date-option {
+	display: inline-block;
+    width: 40px;
+}
+.date { 
+	display: inline-block; 
+	width: 165px; 
+}
+.student {
+	padding-bottom: 20px;
+}
+.time { 
+	display: inline-block; 
+	width: 120px; 
+}
+.date-section {
+	padding-bottom: 20px;
+}
+.time-pref-section {
+	padding-bottom: 20px;
+}
+	
+
