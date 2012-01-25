@@ -121,6 +121,12 @@ class Planning(object):
             else:
                 return request.combination.teacher.key().name()
 
+    def getGuardianIdFromRequest(self, request):
+            if request == None:
+                return ""
+            else:
+                return request.guardian.key().name()
+
     def appointmentsPerDay(self, dayNum, teacher):
         slots = []
         for table in self.days[dayNum]:

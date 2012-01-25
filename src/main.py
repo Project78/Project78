@@ -261,65 +261,65 @@ class InitDataHandler(webapp.RequestHandler):
 
 class GenerateRandomEventHandler(webapp.RequestHandler):
     def get(self):
-#        
-#        try:
-#            while True:
-#                q = db.GqlQuery("SELECT __key__ FROM DayPreference")
-#                assert q.count()
-#                db.delete(q.fetch(500))
-#                time.sleep(0.1)
-#        except Exception, e:
-#            pass
-#
-#        try:
-#            while True:
-#                q = db.GqlQuery("SELECT __key__ FROM TimePreference")
-#                assert q.count()
-#                db.delete(q.fetch(500))
-#                time.sleep(0.1)
-#        except Exception, e:
-#            pass
-#        
-#        try:
-#            while True:
-#                q = db.GqlQuery("SELECT __key__ FROM Request")
-#                assert q.count()
-#                db.delete(q.fetch(500))
-#                time.sleep(0.1)
-#        except Exception, e:
-#            pass
-#        
-#        try:
-#            while True:
-#                q = db.GqlQuery("SELECT __key__ FROM Day")
-#                assert q.count()
-#                db.delete(q.fetch(500))
-#                time.sleep(0.1)
-#        except Exception, e:
-#            pass
-#        
-#        try:
-#            while True:
-#                q = db.GqlQuery("SELECT __key__ FROM Event")
-#                assert q.count()
-#                db.delete(q.fetch(500))
-#                time.sleep(0.1)
-#        except Exception, e:
-#            pass
-#        
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM DayPreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM TimePreference")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Request")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Day")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
+        try:
+            while True:
+                q = db.GqlQuery("SELECT __key__ FROM Event")
+                assert q.count()
+                db.delete(q.fetch(500))
+                time.sleep(0.1)
+        except Exception, e:
+            pass
+        
         
         # Set random seed
         random.seed(1138)
                 
         # Add an event
         event = Event(event_name="paasrapport",
-                      tables=40,
+                      tables=10,
                       talk_time=15)
         event.put()
 
         # Add some days to the aforementioned event
         day = Day(date=datetime.datetime(year=2011, month=11, day=11, hour=20, minute=00),
-                      talks=12,
+                      talks=7,
                       event=event)
         day.put()
 
@@ -333,7 +333,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
 #                      event=event)
 #        day.put()
         
-        guardians = Guardian.all().fetch(110)
+        guardians = Guardian.all().fetch(40)
         for guardian in guardians:
             time = TimePreference()
             time.event = event
