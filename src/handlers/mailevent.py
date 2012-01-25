@@ -10,9 +10,10 @@ from google.appengine.api import users
 from models.guardian import Guardian
 from models.teacher import Teacher
 from classes.attachment import Attachment
-#
-#from reportlab.pdfgen import canvas
-#from reportlab.lib.pagesizes import A4
+
+import sys
+sys.path.insert(0, 'reportlab.zip')
+from reportlab.pdfgen import canvas
 
 class MailHandler(webapp.RequestHandler):
     title = 'title'
@@ -80,15 +81,18 @@ class MailHandler(webapp.RequestHandler):
                     
 #                    print 'mail send to ' + to_addr
             
-#            self.createPDF()
-#    
-#    def createPDF(self):
-#        self.response.headers['Content-Type'] = 'application/pdf'
-#        self.response.headers['Content-Disposition'] = 'attachment; filename=' + self.title + '.pdf'
-#        c = canvas.Canvas(self.response.out, pagesize=A4)
-#    
-#        c.drawString(100, 100, self.text)
-#        c.showPage()
-#        c.save()
+            self.createPDF()
+    
+    def createPDF(self):
+        if not self.text == 'text':
+            p = canvas.Canvas(self.response.out)
+#            p.drawImage('dog.jpg', 150, 400)
+            p.drawString(50, 700, 'The text you entered: ' + self.text)
+            p.showPage()
+
+            self.response.headers['Content-Type'] = 'application/pdf'
+            self.response.headers['Content-Disposition'] = 'filename=' + self.title + '.pdf'
+
+            p.save()
                     
             

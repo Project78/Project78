@@ -1,16 +1,15 @@
-# testpdf.py - test PDF generator
 
+import sys
+sys.path.insert(0, 'reportlab.zip')
 from reportlab.pdfgen import canvas
 
 from google.appengine.ext import webapp
 
 class PDFHandler(webapp.RequestHandler):
     def get(self):
-#        text = self.request.get('t')
-        text = 'random'
+        text = 'hkjh dhkjfhkjdgh kdfhg hkdg '
         if text:
             p = canvas.Canvas(self.response.out)
-#            p.drawImage('dog.jpg', 150, 400)
             p.drawString(50, 700, 'The text you entered: ' + text)
             p.showPage()
 
@@ -18,4 +17,3 @@ class PDFHandler(webapp.RequestHandler):
             self.response.headers['Content-Disposition'] = 'filename=testpdf.pdf'
 
             p.save()
-
