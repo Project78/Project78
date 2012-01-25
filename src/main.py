@@ -41,12 +41,12 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
-from handlers.newevent import NewEvent
 from handlers.editevent import EditEvent
 from handlers.plan import plan
 from handlers.test import test
 from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
+from handlers.subscribe import Subscribe
 
 
 
@@ -58,57 +58,57 @@ class IndexHandler(webapp.RequestHandler):
         }
         self.response.out.write(template.render(path, template_values))
 
-class RegisterHandler(webapp.RequestHandler):
-    def get(self):
-        guardian = Guardian.gql("WHERE guardian_id = :1", 6781)
-        current_event = Event.gql("WHERE event_id = :1", 1)
-        event_days = Day.gql("WHERE event = :1",current_event[0])
-            
-        path = os.path.join(os.path.dirname(__file__), 'templates/eventform.html')
-        template_values = {
-            'guardian': guardian[0],
-            'event': current_event[0],
-            'days': event_days
-        }
-        self.response.out.write(template.render(path, template_values))
-    
-    def post(self):
-        # Pull in all POST arguments
-        params = {}
-        for field in self.request.arguments():
-            params[field] = self.request.get(field)
-        
-        # Filter out ranking info for days            
-        days = {}
-        for key, value in params.items():
-            if not key.find("day_"):
-                days[key.replace("day_", "")] = value
-        
-        # Build new day_preference entities
-        new_days = []
-        for day, rank in days.items():
-            new_day_preference = DayPreference()
-            new_day_preference.day = Day.all().filter("day_id =", int(day)).get()
-            new_day_preference.rank = int(rank)
-            new_day_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
-            new_day_preference.save()
-            new_days.append(new_day_preference)
-        new_days.sort(key=lambda day: day.rank)
-        
-        # Build new time_preference
-        new_time_preference = TimePreference()
-        new_time_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get()
-        new_time_preference.event = Event.all().filter("event_id =", int(self.request.get("event_id"))).get()
-        new_time_preference.preference = int(self.request.get("time_pref"))
-        new_time_preference.save()
-        
-
-        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
-        template_values = {
-            'days': new_days,
-            'time': new_time_preference
-        }
-        self.response.out.write(template.render(path, template_values))
+#class RegisterHandler(webapp.RequestHandler):
+#    def get(self):
+#        guardian = Guardian.gql("WHERE guardian_id = :1", 6781)
+#        current_event = Event.gql("WHERE event_id = :1", 1)
+#        event_days = Day.gql("WHERE event = :1",current_event[0])
+#            
+#        path = os.path.join(os.path.dirname(__file__), 'templates/eventform.html')
+#        template_values = {
+#            'guardian': guardian[0],
+#            'event': current_event[0],
+#            'days': event_days
+#        }
+#        self.response.out.write(template.render(path, template_values))
+#    
+#    def post(self):
+#        # Pull in all POST arguments
+#        params = {}
+#        for field in self.request.arguments():
+#            params[field] = self.request.get(field)
+#        
+#        # Filter out ranking info for days            
+#        days = {}
+#        for key, value in params.items():
+#            if not key.find("day_"):
+#                days[key.replace("day_", "")] = value
+#        
+#        # Build new day_preference entities
+#        new_days = []
+#        for day, rank in days.items():
+#            new_day_preference = DayPreference()
+#            new_day_preference.day = Day.all().filter("day_id =", int(day)).get()
+#            new_day_preference.rank = int(rank)
+#            new_day_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get() 
+#            new_day_preference.save()
+#            new_days.append(new_day_preference)
+#        new_days.sort(key=lambda day: day.rank)
+#        
+#        # Build new time_preference
+#        new_time_preference = TimePreference()
+#        new_time_preference.guardian =  Guardian.all().filter("guardian_id =", int(self.request.get("guardian_id"))).get()
+#        new_time_preference.event = Event.all().filter("event_id =", int(self.request.get("event_id"))).get()
+#        new_time_preference.preference = int(self.request.get("time_pref"))
+#        new_time_preference.save()
+#        
+#
+#        path = os.path.join(os.path.dirname(__file__), 'templates/eventformresponse.html')
+#        template_values = {
+#            'days': new_days,
+#            'time': new_time_preference
+#        }
+#        self.response.out.write(template.render(path, template_values))
 
 
 class ListRegistrationsHandler(webapp.RequestHandler):
@@ -404,7 +404,8 @@ class bulkdelete(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
-                                          ('/inschrijven', RegisterHandler),
+                                          ('/inschrijven/(\d+)/(\d+)', Subscribe),
+#                                          ('/inschrijven', RegisterHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
                                           ('/init', InitDataHandler),
