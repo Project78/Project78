@@ -47,7 +47,7 @@ from handlers.plan import plan
 from handlers.test import test
 from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
-
+from handlers.pdfHandler import PDFHandler
 
 
 class IndexHandler(webapp.RequestHandler):
@@ -416,7 +416,8 @@ def main():
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
                                           ('/administratie/event/(nieuw|\d+)', EditEvent),
-                                          ('/mail', MailHandler)
+                                          ('/mail', MailHandler),
+                                          ('/pdf', PDFHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

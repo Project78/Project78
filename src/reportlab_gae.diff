@@ -1,0 +1,118 @@
+--- reportlab/lib/utils.py	2010-03-22 14:54:35.046337597 +0100
++++ reportlab_gae/lib/utils.py	2010-03-22 14:55:33.170337293 +0100
+@@ -3,6 +3,12 @@
+ # $URI:$
+ __version__=''' $Id: utils.py 3624 2009-12-18 10:52:19Z rgbecker $ '''
+ __doc__='''Gazillions of miscellaneous internal utility functions'''
++
++import zipfile
++originalLoader = __loader__				# replacing __loader__
++originalLoaderZip = zipfile.ZipFile(__loader__.archive, 'r')
++originalLoaderFilesKeys = originalLoaderZip.namelist()	# replacing __loader__._files.keys()
++os_linesep = '\r\n'
+ 
+ import os, sys, imp, time
+ try:
+@@ -152,8 +158,8 @@
+     __file__ = sys.argv[0]
+ import glob, fnmatch
+ try:
+-    _isFSD = not __loader__
+-    _archive = os.path.normcase(os.path.normpath(__loader__.archive))
++    _isFSD = not originalLoader
++    _archive = os.path.normcase(os.path.normpath(originalLoader.archive))
+     _archivepfx = _archive + os.sep
+     _archivedir = os.path.dirname(_archive)
+     _archivedirpfx = _archivedir + os.sep
+@@ -189,11 +195,11 @@
+         c, pfn = __startswith_rl(pattern)
+         r = glob(pfn)
+         if c or r==[]:
+-            r += map(lambda x,D=_archivepfx,pjoin=pjoin: pjoin(_archivepfx,x),filter(lambda x,pfn=pfn,fnmatch=fnmatch: fnmatch(x,pfn),__loader__._files.keys()))
++            r += map(lambda x,D=_archivepfx,pjoin=pjoin: pjoin(_archivepfx,x),filter(lambda x,pfn=pfn,fnmatch=fnmatch: fnmatch(x,pfn),originalLoaderFilesKeys))
+         return r
+ except:
+     _isFSD = os.path.isfile(__file__)   #slight risk of wrong path
+-    __loader__ = None
++    originalLoader = None
+     def _startswith_rl(fn):
+         return fn
+     def rl_glob(pattern,glob=glob.glob):
+@@ -426,12 +432,12 @@
+     try:
+         return open(name,mode)
+     except IOError:
+-        if _isFSD or __loader__ is None: raise
++        if _isFSD or originalLoader is None: raise
+         #we have a __loader__, perhaps the filename starts with
+         #the dirname(reportlab.__file__) or is relative
+-        name = _startswith_rl(name)
+-        s = __loader__.get_data(name)
+-        if 'b' not in mode and os.linesep!='\n': s = s.replace(os.linesep,'\n')
++        #name = _startswith_rl(name)	# outcommented for AppEngine
++        s = originalLoader.get_data(name)
++        if 'b' not in mode and os_linesep!='\n': s = s.replace(os_linesep,'\n')
+         return getStringIO(s)
+ 
+ import urllib
+@@ -456,40 +462,42 @@
+ def rl_isfile(fn,os_path_isfile=os.path.isfile):
+     if hasattr(fn,'read'): return True
+     if os_path_isfile(fn): return True
+-    if _isFSD or __loader__ is None: return False
++    if _isFSD or originalLoader is None: return False
+     fn = _startswith_rl(fn)
+-    return fn in __loader__._files.keys()
++    return fn in originalLoaderFilesKeys
+ 
+ def rl_isdir(pn,os_path_isdir=os.path.isdir,os_path_normpath=os.path.normpath):
+     if os_path_isdir(pn): return True
+-    if _isFSD or __loader__ is None: return False
++    if _isFSD or originalLoader is None: return False
+     pn = _startswith_rl(os_path_normpath(pn))
+     if not pn.endswith(os.sep): pn += os.sep
+-    return len(filter(lambda x,pn=pn: x.startswith(pn),__loader__._files.keys()))>0
++    return len(filter(lambda x,pn=pn: x.startswith(pn),originalLoaderFilesKeys))>0
+ 
+ def rl_listdir(pn,os_path_isdir=os.path.isdir,os_path_normpath=os.path.normpath,os_listdir=os.listdir):
+-    if os_path_isdir(pn) or _isFSD or __loader__ is None: return os_listdir(pn)
++    if os_path_isdir(pn) or _isFSD or originalLoader is None: return os_listdir(pn)
+     pn = _startswith_rl(os_path_normpath(pn))
+     if not pn.endswith(os.sep): pn += os.sep
+-    return [x[len(pn):] for x in __loader__._files.keys() if x.startswith(pn)]
++    return [x[len(pn):] for x in originalLoaderFilesKeys if x.startswith(pn)]
+ 
+ def rl_getmtime(pn,os_path_isfile=os.path.isfile,os_path_normpath=os.path.normpath,os_path_getmtime=os.path.getmtime,time_mktime=time.mktime):
+-    if os_path_isfile(pn) or _isFSD or __loader__ is None: return os_path_getmtime(pn)
++    if os_path_isfile(pn) or _isFSD or originalLoader is None: return os_path_getmtime(pn)
+     p = _startswith_rl(os_path_normpath(pn))
+     try:
+-        e = __loader__._files[p]
++        #e = originalLoader._files[p]
++        e = originalLoaderZip.getinfo(p).date_time
+     except KeyError:
+         return os_path_getmtime(pn)
+-    s = e[5]
+-    d = e[6]
+-    y = ((d>>9)&0x7f)+1980
+-    m = (d>>5)&0xf
+-    d &= 0x1f
+-    h = (s>>11)&0xf
+-    m = (s>>5)&0x3f
+-    s &= 0x1f
+-    s <<= 1
+-    return time_mktime((y,m,d,h,m,s,0,0,0))
++    #s = e[5]
++    #d = e[6]
++    #y = ((d>>9)&0x7f)+1980
++    #m = (d>>5)&0xf
++    #d &= 0x1f
++    #h = (s>>11)&0xf
++    #m = (s>>5)&0x3f
++    #s &= 0x1f
++    #s <<= 1
++    #return time_mktime((y,m,d,h,m,s,0,0,0))
++    return time_mktime((e[0],e[1],e[2],e[3],e[4],e[5],0,0,0))
+ 
+ def rl_get_module(name,dir):
+     if sys.modules.has_key(name):
