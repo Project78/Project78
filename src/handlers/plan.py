@@ -20,17 +20,22 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
+from models.Appointment import Appointment
 from classes.planning import Planning
 
 
 class plan(webapp.RequestHandler):
-    def get(self):
+    def get(self, arg):
         
         print ""
         print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
         print time.strftime("%H:%M:%S", time.localtime())+": Start<br>"
         
-        event = Event.all().filter("event_name", "paasrapport").get()
+        if arg != None:
+            event = Event.get_by_id(int(arg))
+        else:
+            event = Event.all().filter("event_name", "paasrapport").get()
+            
         days = Day.all().filter("event", event).fetch(999)
         days.sort(key=lambda day: day.date)
         max_requests = 0
@@ -171,38 +176,14 @@ class plan(webapp.RequestHandler):
 
 
 
-
-
-
-
-
-
         planning.outputHTML()
         
-#        for day in planning.days:
-#            myDay = []
-#            
-#            for table in day:
-#                for slot in table:
-#                    myDay.append(planning.getTeacherStringFromRequest(slot))
-#                
-##            print myDay
-#            
-#            mySet = set(myDay)
-#            myList = list(mySet)
-#            
-#            print myList
-#            for teacher in myList:
-#                print myDay.count(teacher)
-#            print ""
-
-
-        
-#        for length in range (max_requests, 0, -1):
-#            print "Guardians with "+str(length)+" requests:"
-#            for day in days:
-#                print day.date.strftime("%d-%m-%y")
-#                for guardian in filter(lambda guardian: (len(guardian.requests) == length)
-#                                   and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == 1),
-#                                   guardians):
-#                    print guardian.lastname
+        for dayIndex, day in enumerate(planning.days):
+            for tableIndex, table in enumerate(day):
+                for slotIndex, slot in enumerate(table):
+                    if slot != None:
+                        new_appointment = Appointment(request=slot,
+                                                      day=days[dayIndex],
+                                                      table=tableIndex,
+                                                      slot=slotIndex)
+                        new_appointment.put()
