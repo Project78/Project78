@@ -36,7 +36,7 @@ class plan(webapp.RequestHandler):
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        allguardians = Guardian.all().fetch(500)
+        allguardians = Guardian.all().fetch(9999)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -60,8 +60,7 @@ class plan(webapp.RequestHandler):
         
         print time.strftime("%H:%M:%S", time.localtime())+": All guardians/requests collected<br>"
         
-#        for length in range (max_requests, 0, -1):
-        for length in range (3, 0, -1):
+        for length in range (max_requests, 0, -1):
             for timepref in timepref_options:
                 for rank in range(0, max_rank+1):
                     for day_num, day in enumerate(days):
@@ -81,51 +80,51 @@ class plan(webapp.RequestHandler):
                                 guardians.remove(guardian)
                
         print time.strftime("%H:%M:%S", time.localtime())+": Placed<br>"
-                
-        for dayIndex, day in enumerate(planning.days):
-            safety = 0                                                      # <--- general infinite loop preventer
-            slotNum = 11
-            consecutiveCleanUps = 0
-            direction = -1
-            
 
-                
-        print time.strftime("%H:%M:%S", time.localtime())+": Done?<br>"
-        
-        conflicts = 0
-        for i, slot in enumerate(day[0]):
-            conflicts += len(planning.conflictedTeachers(day, i))
-            
-        print time.strftime("%H:%M:%S", time.localtime())+": Starting off with "+str(conflicts)+"<br>"
         planning.outputHTML()        
 
-        
-
-        
         for day in planning.days:
+            
+            conflicts = 0
+            for i, slot in enumerate(day[0]):
+                conflicts += len(planning.conflictedTeachers(day, i))
+            print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
             
             # <--- Build a list of all regions
         
             regions = []
-            previousGuardian = None
-            region = [None, None, None]
             for tableIndex, table in enumerate(day):
+
+                region = [tableIndex, 0, -1]
+                previousGuardian = ""
+
                 for slotIndex, slot in enumerate(table):
+
                     guardianId = planning.getGuardianIdFromRequest(slot)
-                    if previousGuardian == None:
-                        region = [tableIndex, slotIndex, slotIndex]
-                        if guardianId != "":
-                            previousGuardian = guardianId
-                    elif previousGuardian == guardianId:
-                        region[2] = slotIndex
-                    elif guardianId == "":
-                        region[2] = slotIndex
-                        regions.append(region)
-                        previousGuardian = None
+                    block = table[region[1]:region[2]+1]
+                    
+                    if guardianId == "":
+                        if len(block) == 0:
+                            region = [tableIndex, slotIndex, slotIndex]
+                        elif block.count(None) == 0:
+                            if previousGuardian != "":
+                                region[2] = slotIndex
+                                regions.append(region)
+                                region = [tableIndex, 0, -1]
+                        elif block.count(None) > 0:
+                            regions.append(region)
+                            region = [tableIndex, slotIndex, slotIndex]
+                        previousGuardian = ""
                     else:
-                        regions.append(region)
-                        region = [tableIndex, slotIndex, slotIndex]
+                        if guardianId != previousGuardian and previousGuardian != "":
+                            regions.append(region)
+                            region = [tableIndex, slotIndex, slotIndex]
+                        region[2] = slotIndex
                         previousGuardian = guardianId
+                                
+                block = table[region[1]:region[2]+1]
+                if len(block) > 0:
+                    regions.append(region)
 
             
             # <--- Find all permutations
@@ -142,7 +141,7 @@ class plan(webapp.RequestHandler):
      
             # <---- Op basis van willekeurige permutaties 
            
-            for loop in range(10):
+            for loop in range(1):
                     
                 for setIndex, set in enumerate(regions):          
                     conflictCounter = []
@@ -164,10 +163,10 @@ class plan(webapp.RequestHandler):
                     newList = permutationSets[setIndex][bestOption]
                     day[set[0]][set[1]:set[2]+1] = newList
                    
-                    conflicts = 0
-                    for i, slot in enumerate(day[0]):
-                        conflicts += len(planning.conflictedTeachers(day, i))
-                    print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+                conflicts = 0
+                for i, slot in enumerate(day[0]):
+                    conflicts += len(planning.conflictedTeachers(day, i))
+                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
 
 
 
@@ -178,13 +177,8 @@ class plan(webapp.RequestHandler):
 
 
 
-
-
-
-
-
-
-    
+        planning.outputHTML()
+        
 #        for day in planning.days:
 #            myDay = []
 #            

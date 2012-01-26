@@ -7,40 +7,65 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 from google.appengine.api import users
 
+from models.guardian import Guardian
+from models.teacher import Teacher
+from classes.CreatePDF import CreatePDF
+
 class MailHandler(webapp.RequestHandler):
-    title = ''
-    text = ''
+    title = 'title'
+    text = 'text'
+    attach = ''
     
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-mail.html')
         
-        template_values = {
-            'title': self.title,
-            'text': self.text
-        }
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, {}))
         
-    def post(self):
-        
-        if self.request.POST['i-send-mail']:
-            self.title = self.request.POST['i-title']
-            self.text = self.request.POST['i-text']
-            
+    def post(self):        
+        if self.request.POST['send-mail']:
+            addresses = False
+            if self.request.POST['title']:
+                self.title = self.request.POST['title']
+            if self.request.POST['text']:
+                self.text = self.request.POST['text']
+            if self.request.POST['target'] == 'Specific address(es)':
+                address = self.request.POST['addresses']
+                addresses = address.split(';')
+            try:
+                self.attach = self.request.POST['attach']
+            except KeyError:
+                self.attach = ''
+                
             user = users.get_current_user()
             if user is None:
                 login_url = users.create_login_url(self.request.path)
                 self.redirect(login_url)
                 return
-            to_addr = "t.nieuwenhuys@hotmail.com"
-            if not mail.is_email_valid(to_addr):
-                print 'ERROR!!!'
-                pass
-    
-            message = mail.EmailMessage()
-            message.sender = user.email()
-            message.to = to_addr
-            message.subject = self.title
-            message.body = self.text       
-            message.Send()
             
-            print 'title = ' + self.title + '\ntext = ' + self.text
+            if not addresses:
+                addresses = []
+                if self.request.POST['target'] == 'All guardians':
+                    guardians = Guardian.all()
+                    for guardian in guardians:
+                        addresses.append(guardian.email)
+                elif self.request.POST['target'] == 'All teachers':
+                    teachers = Teacher.all()
+                    for teacher in teachers:
+                        addresses.append(teacher.email)
+            
+            for to_addr in addresses:
+                to_addr = to_addr.strip()
+                if mail.is_email_valid(to_addr):  
+                    message = mail.EmailMessage()
+                    message.sender = user.email()
+                    message.to = to_addr
+                    message.subject = self.title
+                    message.body = self.text
+                    if not self.attach == '':
+                        pdf = CreatePDF().createPDF(self.attach)
+                        if not pdf == None:
+                            message.attachments = [(self.title + '.pdf', pdf)]
+#                            print pdf
+                    message.Send()
+                    print 'E-mail sent to %s' % to_addr
+    
