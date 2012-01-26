@@ -15,10 +15,10 @@
 	</div>
 	{% endblock %}
 	<div id="content">
-		<h1>Inschrijven - login</h1>
+		<h1>Inloggen</h1>
 		<!-- Notifications -->
 		{% if notifications %}
-		<div id="errors">
+		<div id="notifications">
 			<h2>Meldingen</h2>
 			<ul>
 				{% for notification in notifications %}
@@ -29,12 +29,12 @@
 		{% endif %}
 		<form method="post" action="">
 		<div class="label-pair clearfix">
-			<label>Verzorgersnummer:</label><input type="text" name="guardian-id" /><br />
+			<label>Voogdnummer:</label><input type="text" name="guardian-id" /><br />
 		</div>
 		<div class="label-pair clearfix">	
 			<label>Sleutel:</label><input type="password" name="passphrase" /><br />
 		</div>
-			<input type="submit" value="Inloggen als ouder/verzorger " name="guardian-login" /><br />
+			<input type="submit" value="Inloggen als voogd " name="guardian-login" /><br />
 		</form>
 	</div>
 </div>

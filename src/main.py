@@ -406,8 +406,8 @@ class bulkdelete(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
-                                          ('/inschrijven/(\d+)/(\d+)', SubscriptionHandler),
-                                          ('/inschrijven/', SubscriptionLoginHandler),
+                                          ('/inschrijven/(\d+)/(\d+)/?', SubscriptionHandler),
+                                          ('/inschrijven/?', SubscriptionLoginHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
                                           ('/init', InitDataHandler),
@@ -416,11 +416,11 @@ def main():
                                           ('/test', test),
                                           ('/fix', FixTeachers),
                                           ('/requests', DisplayRequestsHandler),
-                                          ('/administratie', EventHandler),
+                                          ('/administratie/?', EventHandler),
                                           ('/clear', bulkdelete),
-                                          ('/administratie/event/(nieuw|\d+)', EditEvent),
+                                          ('/administratie/event/(nieuw|\d+)/?', EditEvent),
                                           ('/mail', MailHandler),
-                                          ('/inschrijven/logout', SubscriptionLogoutHandler)
+                                          ('/inschrijven/uitloggen/?', SubscriptionLogoutHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
