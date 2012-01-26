@@ -1,19 +1,27 @@
 
 import os
+import sys
 
+sys.path.insert(0, 'reportlab.zip')
+sys.path.insert(0, 'PIL.zip')
+
+from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 from google.appengine.api import users
+from google.appengine.api import images
 
 from models.guardian import Guardian
 from models.teacher import Teacher
 from classes.attachment import Attachment
 
-import sys
-sys.path.insert(0, 'reportlab.zip')
 from reportlab.pdfgen import canvas
+try:
+    from PIL import Image
+except ImportError:
+    import Image
 
 class MailHandler(webapp.RequestHandler):
     title = 'title'
@@ -86,7 +94,12 @@ class MailHandler(webapp.RequestHandler):
     def createPDF(self):
         if not self.text == 'text':
             p = canvas.Canvas(self.response.out)
-#            p.drawImage('dog.jpg', 150, 400)
+            blob = db.Blob(open("logo.png", "rb").read())
+#            self.response.headers['Content-Type'] = "image/png"
+#            self.response.out.write(blob)
+#            im = Image.open(blob)
+            im = images.Image(blob)
+            p.drawImage(im, 150, 400);
             p.drawString(50, 700, 'The text you entered: ' + self.text)
             p.showPage()
 
@@ -94,5 +107,4 @@ class MailHandler(webapp.RequestHandler):
             self.response.headers['Content-Disposition'] = 'filename=' + self.title + '.pdf'
 
             p.save()
-                    
             
