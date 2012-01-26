@@ -167,11 +167,15 @@ class plan(webapp.RequestHandler):
                     bestOption = random.choice(bestOptions)
                     newList = permutationSets[setIndex][bestOption]
                     day[set[0]][set[1]:set[2]+1] = newList
+                    if lowestValue == 0:
+                        break
                    
                 conflicts = 0
                 for i, slot in enumerate(day[0]):
                     conflicts += len(planning.conflictedTeachers(day, i))
                 print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+                if conflicts == 0:
+                    break
 
 
 
