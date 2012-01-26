@@ -67,5 +67,5 @@ class MailHandler(webapp.RequestHandler):
                             message.attachments = [(self.title + '.pdf', pdf)]
 #                            print pdf
                     message.Send()
-                    print 'E-mail send to %s' % to_addr
+                    print 'E-mail sent to %s' % to_addr
     
