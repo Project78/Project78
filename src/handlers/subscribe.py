@@ -18,37 +18,33 @@ from models.request import Request
 from models.subject import Subject
 from models.timepreference import TimePreference
 from models.daypreference import DayPreference
+from models.subscriptiondetails import SubscriptionDetails
 
 class Subscribe(webapp.RequestHandler):
 #        /inschrijven/1285/1111
 
     #@todo: authorization ok?
-    #@todo: is it already filled in?
-    #@todo: max number per student ok?
-    #@todo: does event exist?
-    #@todo: does guardian exists?
-    #@todo: has the guardian the right students?
     #@todo: how do users log in?
-    #@todo: does subject code exist?
     #@todo: where to go after good post?
-    #@todo: where to go after error?
-    #@todo: time pref ok?
-    #@todo: day pref ok?
+
 
     def get(self, eventId, guardianId):
         event = Event.get_by_id(int(eventId))
         days = Day.gql("WHERE event = :1", event).fetch(999)
         guardian = Guardian.get_by_key_name(guardianId)
+        errors = []
+        templVal = {
+            'errors': errors
+        }
+        subscriptionDetailsList = SubscriptionDetails.gql("WHERE event = :1 AND guardian = :2", event, guardian).fetch(1, 0)
+        subscriptionDetails = subscriptionDetailsList[0]
+        if subscriptionDetails and subscriptionDetails.requested:
+            errors.append('U kunt geen verzoeken meer indienen.')
+            self.showError(templVal)
+            return            
+        
         students = Student.gql("WHERE guardian = :1", guardian).fetch(999, 0)
-
-        students_subjects = [] 
-        for student in students:
-            class_id = student.class_id 
-            combinations = Combination.gql("WHERE class_id = :1", class_id).fetch(10, 0)
-            subjects = []
-            for combination in combinations:
-                subjects.append(combination.subject)
-            students_subjects.append([student, subjects])
+        students_subjects = self.getStudentsSubjects(students) 
 
         if event and guardian and students and days:
             templVal = {
@@ -66,6 +62,28 @@ class Subscribe(webapp.RequestHandler):
         days = Day.gql("WHERE event = :1", event).fetch(999)
         guardian = Guardian.get_by_key_name(guardianId)
         students = Student.gql("WHERE guardian = :1", guardian).fetch(999, 0)
+        students_subjects = self.getStudentsSubjects(students)
+        errors = []
+        templVal = {
+            'event': event,
+            'days': days,
+            'guardian': guardian,
+            'students': students_subjects,
+            'errors': errors
+        }
+           
+        if not (event and days and guardian and students):
+            errors.append('U probeert een onmogelijke bewerking uit te voeren.')
+            self.showError(templVal)
+            return
+        
+        subscriptionDetailsList = SubscriptionDetails.gql("WHERE event = :1 AND guardian = :2", event, guardian).fetch(1, 0)
+        subscriptionDetails = subscriptionDetailsList[0]
+        if subscriptionDetails and subscriptionDetails.requested:
+            errors.append('U kunt geen verzoeken meer indienen.')
+            self.showError(templVal)
+            return
+        
         studentKeys = [str(k.replace('subject_', '')) for k in self.request.arguments() if re.match("subject_.+", k)]
         requests = []
         dayPrefs = []
@@ -73,26 +91,39 @@ class Subscribe(webapp.RequestHandler):
         for s in students[:]:
             if str(s.key().name()) not in studentKeys:
                 students.remove(s)
+                
+        if not students:
+            errors.append('U kunt geen verzoek indienen als u geen enkel vak geselecteerd heeft. ')
+        
         for student in students[:]:
             subjectCodes = [c for c in self.request.get_all("subject_" + str(student.key().name()))]
             subjects = Subject.get_by_key_name(subjectCodes)
+            if len(subjectCodes) > 3:
+                errors.append('U kunt maximaal 3 vakken per leerling bespreken.')
+            if len(subjectCodes) != len(subjects):
+                errors.append('U probeert een onmogelijke bewerking uit te voeren.')
+                
             for subject in subjects:
                 combination = Combination.gql("WHERE class_id = :1 AND subject = :2", student.class_id, subject).fetch(1,0)[0]
+                if not combination:
+                    errors.append('U probeert een onmogelijke bewerking uit te voeren.')
+                    self.showError(templVal)
+                    return
                 request = Request()
                 request.event = event
                 request.guardian = guardian
                 request.student = student
                 request.combination = combination
                 requests.append(request)
-        
-        
+
         timePref = TimePreference()
         timePref.event = event
         timePref.guardian = guardian
         timePref.preference = 0
-        if self.request.get('time_pref') and (int(self.request.get('time_pref')) in [0,1,2]):
+        if not (self.request.get('time_pref') and (int(self.request.get('time_pref')) in [0,1,2])):
+            errors.append('U moet een voorkeur voor tijd aangeven.')
+        else:            
             timePref.preference = int(self.request.get('time_pref'))
-        
         
         dayKeys = [long(k.replace('date_', '')) for k in self.request.arguments() if re.match("date_.+", k)]
         dayKeysFromStore= [day.key().id() for day in days]
@@ -100,32 +131,58 @@ class Subscribe(webapp.RequestHandler):
         for dayKey in dayKeys:
             if dayKey not in dayKeysFromStore:
                 daysOk = False
-                break
+                errors.append('U probeert een onmogelijke bewerking uit te voeren.')
+                self.showError(templVal)
+                return
+            
         dayPrefsList = [int(self.request.get(k)) for k in self.request.arguments() if re.match("date_.+", k)]
         dayPrefsList.sort()
-        dayPrefsOk = False
-        if dayPrefsList == [1,2,3]:
-            dayPrefsOk = True
+        dayPrefsOk = True
+        if dayPrefsList != [1,2,3]:
+            dayPrefsOk = False
+            errors.append('U moet een eerste, een tweede en een derde voorkeur aangeven')
+
         
         if daysOk and dayPrefsOk:
             for day in days:
-                print 'day number'
                 dayPref = DayPreference()
                 dayPref.day = day
                 dayPref.guardian = guardian
                 dayPref.rank = int(self.request.get("date_" + str(day.key().id())))
                 dayPrefs.append(dayPref)
-                
-#                print dayPref.day
-#                print dayPref.guardian
-#                print dayPref.rank
-
+        
+        if errors:
+            path = os.path.join(os.path.dirname(__file__), '../templates/subscription.html')
+            self.response.out.write(template.render(path, templVal))
+            return
+        
         for request in requests:
             request.put()
         for dayPref in dayPrefs:
             dayPref.put()
         timePref.put()
+        subscriptionDetails.requested = True
+        subscriptionDetails.put()
         
 
+    def getStudentsSubjects(self, students):
+        students_subjects = []
+        for student in students:
+            class_id = student.class_id 
+            combinations = Combination.gql("WHERE class_id = :1", class_id).fetch(10, 0)
+            subjects = []
+            for combination in combinations:
+                subjects.append(combination.subject)
+            students_subjects.append([student, subjects])
+        return students_subjects
 
+    def showError(self, templVal):
+        path = os.path.join(os.path.dirname(__file__), '../templates/error.html')
+        self.response.out.write(template.render(path, templVal))
+
+    def authorize(self):
+        return
     
+
+
+

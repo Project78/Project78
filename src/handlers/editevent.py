@@ -1,11 +1,14 @@
 import os
 import datetime
 import re
+import binascii
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from models.event import Event
 from models.day import Day
+from models.guardian import Guardian
+from models.subscriptiondetails import SubscriptionDetails
 from copy import deepcopy
 
 class EditEvent(webapp.RequestHandler):
@@ -94,6 +97,8 @@ class EditEvent(webapp.RequestHandler):
                     d.updateEndTime()
                     d.put()
                 
+                if arg == 'nieuw':
+                    self.createGuardianPasses(nE)
                 self.redirect('/administratie')
     
     def getMonthText(self, i):
@@ -110,7 +115,17 @@ class EditEvent(webapp.RequestHandler):
             10: 'oktober',
             11: 'november',
             12: 'december'
-        }.get(i, '')  
+        }.get(i, '')
+        
+    def createGuardianPasses(self, event):
+        for g in Guardian.all():
+            sD = SubscriptionDetails()
+            sD.event = event
+            sD.guardian = g
+            sD.requested = False
+            sD.passphrase = binascii.b2a_hex(os.urandom(15))
+            sD.put()
+
 
 
 class Validator:

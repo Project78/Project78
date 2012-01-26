@@ -227,5 +227,10 @@ th
 .time-pref-section {
 	padding-bottom: 20px;
 }
+#errors {
+	background-color: #ff8080;
+	padding: 0 15px 15px 15px;
+	margin-bottom: 20px;
+}
 	
 
