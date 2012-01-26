@@ -75,8 +75,9 @@ class MailHandler(webapp.RequestHandler):
                         pdf = self.createPDF(self.attach)
                         if not pdf == None:
                             message.attachments = [(self.title + '.pdf', pdf)]
-                            print pdf
+#                            print pdf
                     message.Send()
+                    print 'E-mail send to %s' % to_addr
                     
     def createPDF(self, text):
         if not text.strip() == '':
@@ -84,8 +85,9 @@ class MailHandler(webapp.RequestHandler):
             p = canvas.Canvas(buf, pagesize=A4)
             p.setFont('Helvetica-Bold', 20)
             p.drawString(50, 780, "Donald Knuth College")
-            parts = text.split('\n')
+            p.line(50, 774, 540, 774)
             
+            parts = text.split('\n')
             p.setFont('Helvetica', 10)
             i = 0
             jump = 16
@@ -106,14 +108,16 @@ class MailHandler(webapp.RequestHandler):
                                 s = pt + ' '
                                 i += jump
                             else:
-                                self.nextPage(p, s, limit)
+                                self.nextPage(p)
+                                p.drawString(50, limit, s.strip())
                                 s = pt + ' '
                                 i = jump
                     
                     p.drawString(50, limit - i, s.strip())
                     i += jump
                 else:
-                    self.nextPage(p, part, limit)
+                    self.nextPage(p)
+                    p.drawString(50, limit, part.strip())
                     i = jump
 
             p.save()
@@ -123,11 +127,10 @@ class MailHandler(webapp.RequestHandler):
         else:
             return None
         
-    def nextPage(self, p, s, limit):
+    def nextPage(self, p):
         p.showPage()
         p.setFont('Helvetica-Bold', 20)
         p.drawString(50, 780, "Donald Knuth College")
-        
+        p.line(50, 774, 540, 774)
         p.setFont('Helvetica', 10)
-        p.drawString(50, limit, s.strip())
     
