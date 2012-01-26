@@ -3,29 +3,28 @@ import os
 import sys
 
 sys.path.insert(0, 'reportlab.zip')
-sys.path.insert(0, 'PIL.zip')
 
-from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 from google.appengine.api import users
-from google.appengine.api import images
 
 from models.guardian import Guardian
 from models.teacher import Teacher
-from classes.attachment import Attachment
 
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
 try:
-    from PIL import Image
+    from cStringIO import StringIO
 except ImportError:
-    import Image
+    from StringIO import StringIO
 
 class MailHandler(webapp.RequestHandler):
     title = 'title'
     text = 'text'
+    attach = ''
     
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-mail.html')
@@ -43,13 +42,9 @@ class MailHandler(webapp.RequestHandler):
                 address = self.request.POST['addresses']
                 addresses = address.split(';')
             try:
-                if self.request.POST['attach']:
-                    attach = self.request.POST['attach']
-                    attachments = []
-                    for attachment in attach.split(';'):
-                        attachments.append(Attachment(attachment))
+                self.attach = self.request.POST['attach']
             except KeyError:
-                attachments = False
+                self.attach = ''
                 
             user = users.get_current_user()
             if user is None:
@@ -70,41 +65,69 @@ class MailHandler(webapp.RequestHandler):
             
             for to_addr in addresses:
                 to_addr = to_addr.strip()
-                if not mail.is_email_valid(to_addr):
-                    print to_addr + ' is not a valid e-mail address'
-                else:
-                    att = []
-                    if not attachments == False:
-                        for attachment in attachments:
-                            att.append((attachment.name, attachment.read))
-                        
+                if mail.is_email_valid(to_addr):  
                     message = mail.EmailMessage()
                     message.sender = user.email()
                     message.to = to_addr
                     message.subject = self.title
                     message.body = self.text
-                    if len(att) > 0:
-                        message.attachments = att
+                    if not self.attach == '':
+                        pdf = self.createPDF(self.attach)
+                        if not pdf == None:
+                            message.attachments = [(self.title + '.pdf', pdf)]
+                            print pdf
                     message.Send()
                     
-#                    print 'mail send to ' + to_addr
+    def createPDF(self, text):
+        if not text.strip() == '':
+            buf = StringIO()
+            p = canvas.Canvas(buf, pagesize=A4)
+            p.setFont('Helvetica-Bold', 20)
+            p.drawString(50, 780, "Donald Knuth College")
+            parts = text.split('\n')
             
-            self.createPDF()
-    
-    def createPDF(self):
-        if not self.text == 'text':
-            p = canvas.Canvas(self.response.out)
-            blob = db.Blob(open("logo.png", "rb").read())
-#            self.response.headers['Content-Type'] = "image/png"
-#            self.response.out.write(blob)
-#            im = Image.open(blob)
-            im = images.Image(blob)
-            p.drawImage(im, 150, 400);
-            p.drawString(50, 700, 'The text you entered: ' + self.text)
-            p.showPage()
-
-            self.response.headers['Content-Type'] = 'application/pdf'
-            self.response.headers['Content-Disposition'] = 'filename=' + self.title + '.pdf'
+            p.setFont('Helvetica', 10)
+            i = 0
+            jump = 16
+            limit = 750
+            lineWidth = 110
+            
+            for part in parts:
+                if i + 60 <= limit:
+                    part = part.strip();
+                    pts = part.split(' ')
+                    s = ''
+                    for pt in pts:
+                        if len(s) + len(pt) < lineWidth:
+                            s += pt + ' '
+                        else:
+                            if i + 60 <= limit:
+                                p.drawString(50, limit - i, s.strip())
+                                s = pt + ' '
+                                i += jump
+                            else:
+                                self.nextPage(p, s, limit)
+                                s = pt + ' '
+                                i = jump
+                    
+                    p.drawString(50, limit - i, s.strip())
+                    i += jump
+                else:
+                    self.nextPage(p, part, limit)
+                    i = jump
 
             p.save()
-            
+            pdf = buf.getvalue()
+            buf.close() 
+            return pdf
+        else:
+            return None
+        
+    def nextPage(self, p, s, limit):
+        p.showPage()
+        p.setFont('Helvetica-Bold', 20)
+        p.drawString(50, 780, "Donald Knuth College")
+        
+        p.setFont('Helvetica', 10)
+        p.drawString(50, limit, s.strip())
+    

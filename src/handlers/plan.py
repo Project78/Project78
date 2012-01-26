@@ -4,6 +4,11 @@ Created on Dec 18, 2011
 @author: averaart
 '''
 
+import time
+import random
+import math
+import itertools
+
 from google.appengine.ext import webapp
 from models.event import Event
 from models.day import Day
@@ -20,13 +25,18 @@ from classes.planning import Planning
 
 class plan(webapp.RequestHandler):
     def get(self):
+        
+        print ""
+        print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
+        print time.strftime("%H:%M:%S", time.localtime())+": Start<br>"
+        
         event = Event.all().filter("event_name", "paasrapport").get()
         days = Day.all().filter("event", event).fetch(999)
         days.sort(key=lambda day: day.date)
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        allguardians = Guardian.all().fetch(9999)
+        allguardians = Guardian.all().fetch(500)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -44,12 +54,14 @@ class plan(webapp.RequestHandler):
                 guardians.append(guardian)
 
         timepref_options = range(max_timepref+1)
-        print ""
         timepref_options = [1,2,0]
         
         planning = Planning(event, days)
-            
-        for length in range (max_requests, 0, -1):
+        
+        print time.strftime("%H:%M:%S", time.localtime())+": All guardians/requests collected<br>"
+        
+#        for length in range (max_requests, 0, -1):
+        for length in range (3, 0, -1):
             for timepref in timepref_options:
                 for rank in range(0, max_rank+1):
                     for day_num, day in enumerate(days):
@@ -67,69 +79,128 @@ class plan(webapp.RequestHandler):
                             # on fail, the guardian will return on a less preferable round
                             if (placed):
                                 guardians.remove(guardian)
-                                planning.outputHTML()
-                                
-
-#        planning.pprint()
-#        planning.days[0][0][1], planning.days[0][0][3] = planning.days[0][0][3], planning.days[0][0][1]
-#        planning.pprint()
-        
-        
-        
+               
+        print time.strftime("%H:%M:%S", time.localtime())+": Placed<br>"
+                
         for dayIndex, day in enumerate(planning.days):
-            i = 0
-            direction = 1
-            while 0 <= i < len(planning.flipped(day)):
-                slot = planning.flipped(day)[i]
-                conflicted = planning.conflictedTeachers(day, i)
-                while(conflicted):
-#                    print conflicted
-                    teachers = map(planning.getTeacherStringFromRequest, planning.flipped(day)[i])
-                    moveCounters = map(planning.getMoveCounter, planning.flipped(day)[i])
-                    # all indices with the conflicted teacher
-                    indices = [j for j, x in enumerate(teachers) if x == conflicted[0]]
-                    teacherMoveCounters = [moveCounters[x] for x in indices]
-                    lowestMoveCounter = min(teacherMoveCounters)
-                    lowestMoveCounterIndex = teacherMoveCounters.index(lowestMoveCounter)
-                    index = indices[lowestMoveCounterIndex]
-                    if i == len(planning.flipped(day))-1:
-                        direction = -1
-                        
-#                    print "all teachers in slot "+str(i)+": "+str(teachers)
-#                    print "respective moveCounters: "+str(moveCounters)
-#                    print "conflicted teacher: " +str(conflicted[0])
-#                    print "indices of the current conflicted teacher: "+ str(indices)
-#                    print "moveCounters for current conflicted teacher: "+str(teacherMoveCounters)
-#                    print "lowest moveCounter for current conflicted teacher: "+str(lowestMoveCounter)
-#                    print "table position of conflicted teacher in slot: "+str(index)
-                                            
-                    day[index][i], day[index][i+direction] = day[index][i+direction], day[index][i]
-                    if day[index][i] != None:
-                        day[index][i].moveCounter += 1
-                    if day[index][i+direction] != None:
-                        day[index][i+direction].moveCounter += 1
-#                    print "Day: "+str(dayIndex+1)
-#                    planning.pprint_day(day)
-                    conflicted = planning.conflictedTeachers(day, i)
-                    planning.outputHTML()
+            safety = 0                                                      # <--- general infinite loop preventer
+            slotNum = 11
+            consecutiveCleanUps = 0
+            direction = -1
+            
 
-                i+=direction
-                        
+                
+        print time.strftime("%H:%M:%S", time.localtime())+": Done?<br>"
+        
+        conflicts = 0
+        for i, slot in enumerate(day[0]):
+            conflicts += len(planning.conflictedTeachers(day, i))
+            
+        print time.strftime("%H:%M:%S", time.localtime())+": Starting off with "+str(conflicts)+"<br>"
+        planning.outputHTML()        
 
         
-#        myDay = []
-#        
-#        for table in planning.days[2]:
-#            for slot in table:
-#                myDay.append(planning.getTeacherStringFromRequest(slot))
+
+        
+        for day in planning.days:
+            
+            # <--- Build a list of all regions
+        
+            regions = []
+            previousGuardian = None
+            region = [None, None, None]
+            for tableIndex, table in enumerate(day):
+                for slotIndex, slot in enumerate(table):
+                    guardianId = planning.getGuardianIdFromRequest(slot)
+                    if previousGuardian == None:
+                        region = [tableIndex, slotIndex, slotIndex]
+                        if guardianId != "":
+                            previousGuardian = guardianId
+                    elif previousGuardian == guardianId:
+                        region[2] = slotIndex
+                    elif guardianId == "":
+                        region[2] = slotIndex
+                        regions.append(region)
+                        previousGuardian = None
+                    else:
+                        regions.append(region)
+                        region = [tableIndex, slotIndex, slotIndex]
+                        previousGuardian = guardianId
+
+            
+            # <--- Find all permutations
+            
+            permutationSets = []
+            
+            for set in regions:          
+                block = day[set[0]][set[1]:set[2]+1]
+                permutations = itertools.permutations(block)
+                permutations = list(permutations)
+                permutationSets.append(permutations)
+            
+            
+     
+            # <---- Op basis van willekeurige permutaties 
+           
+            for loop in range(10):
+                    
+                for setIndex, set in enumerate(regions):          
+                    conflictCounter = []
+                    
+                    for perm in permutationSets[setIndex]:
+                        
+                        block = day[set[0]][set[1]:(set[2]+1)]
+                        day[set[0]][set[1]:(set[2]+1)] = perm
+                        
+                        conflicts = 0                    
+                        for i, slot in enumerate(day[0]):
+                            conflicts += len(planning.conflictedTeachers(day, i))
+                        conflictCounter.append(conflicts)
+                    
+                    lowestValue = min(conflictCounter)
+                    
+                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
+                    bestOption = random.choice(bestOptions)
+                    newList = permutationSets[setIndex][bestOption]
+                    day[set[0]][set[1]:set[2]+1] = newList
+                   
+                    conflicts = 0
+                    for i, slot in enumerate(day[0]):
+                        conflicts += len(planning.conflictedTeachers(day, i))
+                    print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+#        for day in planning.days:
+#            myDay = []
 #            
-#        print myDay
-#        
-#        mySet = set(myDay)
-#        myList = list(mySet)
-#        
-#        for teacher in myList:
-#            print myDay.count(teacher)
+#            for table in day:
+#                for slot in table:
+#                    myDay.append(planning.getTeacherStringFromRequest(slot))
+#                
+##            print myDay
+#            
+#            mySet = set(myDay)
+#            myList = list(mySet)
+#            
+#            print myList
+#            for teacher in myList:
+#                print myDay.count(teacher)
+#            print ""
 
 
         
