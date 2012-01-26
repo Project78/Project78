@@ -5,6 +5,7 @@ Created on Nov 27, 2011
 '''
 
 import random
+import itertools
 
 for n,m in ( ('reverse(o)','n.reverse()'),('sort(o)','n.sort()'),\
                 ('extend(o,o1)','n.extend(o1)')): exec "def %s:\n t=type\n to=t(o)\
@@ -42,7 +43,14 @@ class Planning(object):
             nextEmpty = [self.nextNone(table) for table in day]
         
         for i, table in enumerate(day):
-            if table.count(None) < length:
+#            if table.count(None) < length:
+            consecutiveNone = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
+            if len(consecutiveNone) > 0:
+                longestConsecutiveNone = max(consecutiveNone)
+            else:
+                longestConsecutiveNone = 0
+            
+            if longestConsecutiveNone < length:
                 nextEmpty[i] = 999
         
         if min(nextEmpty) == 999:
@@ -68,12 +76,24 @@ class Planning(object):
         if nextTable == 999:
             return False
         
+        startingIndex = 999
+        
         nextTable = self.days[day_num][nextTable]
         if (reversed):
-            startingIndex = len(nextTable)-length-reverse(nextTable).index(None)
+            for slotIndex, slot in enumerate(reverse(nextTable)):
+                if nextTable[slotIndex] == None and nextTable[slotIndex+1] == None:
+                    startingIndex = len(nextTable)-length-slotIndex
+                    break
         else:
-            startingIndex = nextTable.index(None)
-            
+            for slotIndex, slot in enumerate(nextTable):
+                if nextTable[slotIndex] == None and nextTable[slotIndex+1] == None:
+                    startingIndex = slotIndex
+                    break
+        
+        if startingIndex == 999:
+            return False
+        
+        
         for requestIndex, slotIndex in enumerate(range(startingIndex, startingIndex+length)):
             nextTable[slotIndex] = guardian.requests[requestIndex]
             nextTable[slotIndex].moveCounter=0
@@ -84,7 +104,7 @@ class Planning(object):
         
     def nextNone(self, list):
         try:
-            result = list.index(None)
+            result = list.index(None)+1
         except:
             result = 999
         return result

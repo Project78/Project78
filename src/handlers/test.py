@@ -4,6 +4,7 @@ Created on Dec 20, 2011
 @author: averaart
 '''
 
+import itertools
 
 from sets import Set
 from google.appengine.ext import webapp
@@ -24,7 +25,10 @@ from classes.planning import Planning
 
 class test(webapp.RequestHandler):
     def get(self):
-        print ""
+        table = [None, 2, 5, 7, None, None, None, None, None, 4, None, 3, 7, None, None]
+        consecutiveNone = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
+        if len(consecutiveNone) > 0:
+            print max(consecutiveNone)
         
         
 #        Overzicht van docenten met aantal vak/klas combinaties
