@@ -5,6 +5,9 @@ a {
 	text-decoration: none;
 	color: blue;
 }
+a:hover {
+	text-decoration: underline;
+}
 body {
 	font-family: "Trebuchet MS";
 	line-height: 20px;
@@ -65,6 +68,10 @@ li {
 	border-width: 0 1px 1px 1px;
 	border-color: #aaa;
 	border-style: solid;
+}
+
+.breadcrumb {
+	padding-bottom: 20px;
 }
 
 /*********************  NOTIFICATIONS *****************************/
@@ -256,4 +263,14 @@ th
 	margin-bottom: 20px;
 }
 	
+/******************** ADMINISTRATION ********************/
+.administration-links li a {
+	display: block;
+	padding: 10px;
+	background-color: #eee;
+	margin-bottom: 10px;
+}
+.administration-links li a:hover {
+	background-color: #ddd;
+}
 

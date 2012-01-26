@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div id="content" class="clearfix">
-		<a id="new-event-button" href="/administratie/event/nieuw">Nieuwe ouderavondreeks</a>
+		<div class="breadcrumb"><a href="/administratie">Administratie</a> / <a href="/administratie/events">Overzicht ouderavondreeksen</a></div>
 		<h1>Overzicht ouderavondreeksen</h1>
 		<ul id="event-list">
 			{% for event in events %}
@@ -20,6 +20,7 @@
 			</li>
 			{% endfor %}
 		</ul>
+		<a id="new-event-button" href="/administratie/event/nieuw">Nieuwe ouderavondreeks</a>
 	</div>
 
 {% endblock %}

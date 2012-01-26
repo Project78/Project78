@@ -49,6 +49,7 @@ from handlers.mailevent import MailHandler
 from handlers.subscribe import SubscriptionHandler
 from handlers.subscribe import SubscriptionLoginHandler
 from handlers.subscribe import SubscriptionLogoutHandler
+from handlers.administration import AdministrationIndexHandler
 
 class IndexHandler(webapp.RequestHandler):
     def get(self):
@@ -416,9 +417,7 @@ def main():
                                           ('/test', test),
                                           ('/fix', FixTeachers),
                                           ('/requests', DisplayRequestsHandler),
-                                          ('/administratie/?', EventHandler),
                                           ('/clear', bulkdelete),
-                                          ('/administratie/event/(nieuw|\d+)/?', EditEvent),
                                           ('/mail', MailHandler),
                                           ('/inschrijven/uitloggen/?', SubscriptionLogoutHandler)
                                           ],
