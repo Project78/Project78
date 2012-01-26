@@ -48,8 +48,6 @@ from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
 from handlers.subscribe import Subscribe
 
-
-
 class IndexHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
