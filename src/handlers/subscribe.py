@@ -180,9 +180,101 @@ class Subscribe(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/error.html')
         self.response.out.write(template.render(path, templVal))
 
-    def authorize(self):
+
+
+
+
+
+class SubscriptionLoginHandler(webapp.RequestHandler):
+    
+    def get(self):
+        session = get_current_session()
+        '''A guardian is already logged in'''
+        if self.isLoggedIn():
+            self.redirectToSubscriptionPage()
+            return
+        
+        '''A visitor is not authenticated as a guardian, so move on to the login page'''
+        session.terminate()
+        self.showLoginPage({})
         return
     
+    def post(self):
+        session = get_current_session()
+        '''A guardian is already logged in'''
+        if self.isLoggedIn():
+            self.redirectToSubscriptionPage()
+            return
+        
+        '''A visitor is not authenticated as a guardian, so move on'''
+        session.clear()
+        notifications = []
+        templVal = {
+            'notifications': notifications
+        }
+        
+        '''The guardian-id and/or passphrase are/is empty'''
+        if not (self.request.get('guardian-id') and self.request.get('passphrase')):
+            notifications.append('Vul uw verzorgersnummer in en de sleutel die u ontvangen heeft.')
+            self.showLoginPage(templVal)
+            return
 
+        guardian = Guardian.get_by_key_name(self.request.get('guardian-id'))
+        passphrase = self.request.get('passphrase')
+        
+        '''A gardian with the given keyname does not exists'''
+        if not guardian:
+            notifications.append('Vul een bestaand verzorgersnummer in.')
+            self.showLoginPage(templVal)
+            return
 
+        '''A combination of the gardian and the passphrase does not exists.'''
+        subscriptionDetailsList = SubscriptionDetails.gql("WHERE guardian = :1 AND passphrase = :2", guardian, passphrase).fetch(1,0)
+        if not subscriptionDetailsList:
+            notifications.append('Vul een geldige combinatie van verzorgersnummer en sleutel in.')
+            self.showLoginPage(templVal)
+            return
+        
+        subscriptionDetails = subscriptionDetailsList[0]
+        
+        '''The guardian has already made a subscription for the concerning event'''
+        if subscriptionDetails.requested:
+            notifications.append('U heeft al een inschrijving gedaan.')
+            #@TODO
+            return
+        
+        '''Everything is ok, so login and go to the subscription page!'''
+        event = subscriptionDetails.event
+        session['guardian'] = guardian
+        session['event'] = event
+        self.redirectToSubscriptionPage()
+
+    def isLoggedIn(self):
+        session = get_current_session()
+        if session.is_active():
+            if session['guardian'] and session['event']:
+                return True
+        return False
+
+    def redirectToSubscriptionPage(self):
+        session = get_current_session()
+        event = session['event']
+        guardian = session['guardian']
+        self.redirect('/inschrijven/'+ str(event.key().id()) + '/' + str(guardian.key().name()))
+    
+    def showLoginPage(self, templVal={}):
+        path = os.path.join(os.path.dirname(__file__), '../templates/subscription/subscription-login.html')
+        self.response.out.write(template.render(path, templVal))
+        
+
+class SubscriptionLogoutHandler(webapp.RequestHandler):
+    
+    def get(self):
+        session = get_current_session()
+        session.terminate()
+        self.showLogoutPage()
+
+    def showLogoutPage(self):
+        path = os.path.join(os.path.dirname(__file__), '../templates/subscription/subscription-logout.html')
+        self.response.out.write(template.render(path, {}))
 
