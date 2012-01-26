@@ -46,7 +46,9 @@ from handlers.plan import plan
 from handlers.test import test
 from handlers.fixteachers import FixTeachers
 from handlers.mailevent import MailHandler
-from handlers.subscribe import Subscribe
+from handlers.subscribe import SubscriptionHandler
+from handlers.subscribe import SubscriptionLoginHandler
+from handlers.subscribe import SubscriptionLogoutHandler
 
 
 
@@ -404,8 +406,8 @@ class bulkdelete(webapp.RequestHandler):
 
 def main():
     application = webapp.WSGIApplication([('/', IndexHandler),
-                                          ('/inschrijven/(\d+)/(\d+)', Subscribe),
-#                                          ('/inschrijven', RegisterHandler),
+                                          ('/inschrijven/(\d+)/(\d+)', SubscriptionHandler),
+                                          ('/inschrijven/', SubscriptionLoginHandler),
                                           ('/inschrijvingen', ListRegistrationsHandler),
                                           ('/fill', FillDatabaseHandler),
                                           ('/init', InitDataHandler),
@@ -417,7 +419,8 @@ def main():
                                           ('/administratie', EventHandler),
                                           ('/clear', bulkdelete),
                                           ('/administratie/event/(nieuw|\d+)', EditEvent),
-                                          ('/mail', MailHandler)
+                                          ('/mail', MailHandler),
+                                          ('/inschrijven/logout', SubscriptionLogoutHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

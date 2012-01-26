@@ -1,0 +1,19 @@
+{% extends '../base.html' %}
+
+{% block javascript %}{% endblock %}
+
+{% block body %}
+<div id="wrapper">
+	{% block header %}
+	<div id="header" class="clearfix">
+		<div id="logo"><img src="/static/images/logo.png" alt="Donald Knuth College" title="Donald Knuth College" width="196" height="100" /></div>
+		<div id="slogan"><h1>Donald Knuth College</h1></div>
+		<div id="fontScaling"><a class="scale1" href="javascript:resizeFonts(0);">A</a> <a class="scale2" href="javascript:resizeFonts(1);">A</a> <a class="scale3" href="javascript:resizeFonts(2);">A</a></div>
+	</div>
+	{% endblock %}
+	<div id="content">
+		<h1>Uitgelogd</h1>
+		<p>U bent uitgelogd.</p>
+	</div>
+</div>
+{% endblock %}

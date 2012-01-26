@@ -19,13 +19,13 @@ from models.subject import Subject
 from models.timepreference import TimePreference
 from models.daypreference import DayPreference
 from models.subscriptiondetails import SubscriptionDetails
+from gaesessions import get_current_session
 
-class Subscribe(webapp.RequestHandler):
+class SubscriptionHandler(webapp.RequestHandler):
 #        /inschrijven/1285/1111
 
     #@todo: authorization ok?
     #@todo: how do users log in?
-    #@todo: where to go after good post?
 
 
     def get(self, eventId, guardianId):
@@ -37,6 +37,10 @@ class Subscribe(webapp.RequestHandler):
             'errors': errors
         }
         subscriptionDetailsList = SubscriptionDetails.gql("WHERE event = :1 AND guardian = :2", event, guardian).fetch(1, 0)
+        if not subscriptionDetailsList:
+            errors.append('Pagina niet gevonden.')
+            self.showError(templVal)
+            return    
         subscriptionDetails = subscriptionDetailsList[0]
         if subscriptionDetails and subscriptionDetails.requested:
             errors.append('U kunt geen verzoeken meer indienen.')
@@ -78,6 +82,10 @@ class Subscribe(webapp.RequestHandler):
             return
         
         subscriptionDetailsList = SubscriptionDetails.gql("WHERE event = :1 AND guardian = :2", event, guardian).fetch(1, 0)
+        if not subscriptionDetailsList:
+            errors.append('Pagina niet gevonden.')
+            self.showError(templVal)
+            return           
         subscriptionDetails = subscriptionDetailsList[0]
         if subscriptionDetails and subscriptionDetails.requested:
             errors.append('U kunt geen verzoeken meer indienen.')
@@ -163,6 +171,10 @@ class Subscribe(webapp.RequestHandler):
         timePref.put()
         subscriptionDetails.requested = True
         subscriptionDetails.put()
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/subscriptionsucces.html')
+        self.response.out.write(template.render(path, templVal))
+        return        
         
 
     def getStudentsSubjects(self, students):
