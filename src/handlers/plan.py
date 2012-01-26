@@ -103,46 +103,28 @@ class plan(webapp.RequestHandler):
                     guardianId = planning.getGuardianIdFromRequest(slot)
                     block = table[region[1]:region[2]+1]
                     
-#                    text = str(tableIndex)+"-"+str(slotIndex)
-#                    text += " guardianId: "+str(guardianId)
-                    
                     if guardianId == "":
                         if len(block) == 0:
-#                            text += " - het blok is helemaal leeg, dus ik start een nieuw blok"
                             region = [tableIndex, slotIndex, slotIndex]
                         elif block.count(None) == 0:
-#                            text += " - het blok is niet leeg, maar bevat nog geen None"
                             if previousGuardian != "":
                                 region[2] = slotIndex
                                 regions.append(region)
-                                print "<br>TOEVOEGEN: "+str(region)
                                 region = [tableIndex, 0, -1]
                         elif block.count(None) > 0:
-#                            text += " - het blok is niet leeg, en bevat minstens 1 None - ik start dus een nieuw blok op deze lokatie"
-                            print "<br>TOEVOEGEN: "+str(region)
-#                            regions.append(region)                          # <--- Dit zorgt voor een vastloper???
-#                            print str(region)+"<br>"
+                            regions.append(region)
                             region = [tableIndex, slotIndex, slotIndex]
                         previousGuardian = ""
                     else:
                         if guardianId != previousGuardian and previousGuardian != "":
-#                            text += " - het is een nieuwe guardian, dus ik start een nieuw blok"
-                            print "<br>TOEVOEGEN: "+str(region)                                    # <--- Hier moet ook een append komen...
+                            regions.append(region)
                             region = [tableIndex, slotIndex, slotIndex]
                         region[2] = slotIndex
                         previousGuardian = guardianId
-                
-#                    print text+"<br>"
-                
+                                
                 block = table[region[1]:region[2]+1]
                 if len(block) > 0:
-                    print "<br>TOEVOEGEN: "+str(region)+""                                    # <--- Hier moet ook een append komen...
-                print "<br>Einde van tafel: "+str(tableIndex)
-
-                
-            print str(regions)+"<br>"        
-            for region in regions:
-                print str(region)+"<br>"
+                    regions.append(region)
 
             
             # <--- Find all permutations
@@ -159,7 +141,7 @@ class plan(webapp.RequestHandler):
      
             # <---- Op basis van willekeurige permutaties 
            
-            for loop in range(0):
+            for loop in range(1):
                     
                 for setIndex, set in enumerate(regions):          
                     conflictCounter = []
