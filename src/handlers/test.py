@@ -26,10 +26,13 @@ from classes.planning import Planning
 class test(webapp.RequestHandler):
     def get(self):
         table = [None, 2, 5, 7, None, None, None, None, None, 4, None, 3, 7, None, None]
-        consecutiveNone = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
-        if len(consecutiveNone) > 0:
-            print max(consecutiveNone)
+#        consecutiveNone = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
+#        if len(consecutiveNone) > 0:
+#            print max(consecutiveNone)
         
+        temp = table[0:0]
+        
+        print temp        
         
 #        Overzicht van docenten met aantal vak/klas combinaties
         

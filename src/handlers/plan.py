@@ -36,7 +36,7 @@ class plan(webapp.RequestHandler):
         max_requests = 0
         max_timepref = 0
         max_rank = 0
-        allguardians = Guardian.all().fetch(9999999)
+        allguardians = Guardian.all().fetch(9999)
         guardians = []
         requests = []
         for guardian in allguardians:
@@ -80,100 +80,123 @@ class plan(webapp.RequestHandler):
                                 guardians.remove(guardian)
                
         print time.strftime("%H:%M:%S", time.localtime())+": Placed<br>"
-                        
-#        conflicts = 0
-#        for i, slot in enumerate(day[0]):
-#            conflicts += len(planning.conflictedTeachers(day, i))
-#            
-#        print time.strftime("%H:%M:%S", time.localtime())+": Starting off with "+str(conflicts)+"<br>"
+
         planning.outputHTML()        
 
+        for day in planning.days:
+            
+            conflicts = 0
+            for i, slot in enumerate(day[0]):
+                conflicts += len(planning.conflictedTeachers(day, i))
+            print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+            
+            # <--- Build a list of all regions
         
+            regions = []
+            for tableIndex, table in enumerate(day):
 
+                region = [tableIndex, 0, -1]
+                previousGuardian = ""
+
+                for slotIndex, slot in enumerate(table):
+
+                    guardianId = planning.getGuardianIdFromRequest(slot)
+                    block = table[region[1]:region[2]+1]
+                    
+#                    text = str(tableIndex)+"-"+str(slotIndex)
+#                    text += " guardianId: "+str(guardianId)
+                    
+                    if guardianId == "":
+                        if len(block) == 0:
+#                            text += " - het blok is helemaal leeg, dus ik start een nieuw blok"
+                            region = [tableIndex, slotIndex, slotIndex]
+                        elif block.count(None) == 0:
+#                            text += " - het blok is niet leeg, maar bevat nog geen None"
+                            if previousGuardian != "":
+                                region[2] = slotIndex
+                                regions.append(region)
+                                print "<br>TOEVOEGEN: "+str(region)
+                                region = [tableIndex, 0, -1]
+                        elif block.count(None) > 0:
+#                            text += " - het blok is niet leeg, en bevat minstens 1 None - ik start dus een nieuw blok op deze lokatie"
+                            print "<br>TOEVOEGEN: "+str(region)
+#                            regions.append(region)                          # <--- Dit zorgt voor een vastloper???
+#                            print str(region)+"<br>"
+                            region = [tableIndex, slotIndex, slotIndex]
+                        previousGuardian = ""
+                    else:
+                        if guardianId != previousGuardian and previousGuardian != "":
+#                            text += " - het is een nieuwe guardian, dus ik start een nieuw blok"
+                            print "<br>TOEVOEGEN: "+str(region)                                    # <--- Hier moet ook een append komen...
+                            region = [tableIndex, slotIndex, slotIndex]
+                        region[2] = slotIndex
+                        previousGuardian = guardianId
+                
+#                    print text+"<br>"
+                
+                block = table[region[1]:region[2]+1]
+                if len(block) > 0:
+                    print "<br>TOEVOEGEN: "+str(region)+""                                    # <--- Hier moet ook een append komen...
+                print "<br>Einde van tafel: "+str(tableIndex)
+
+                
+            print str(regions)+"<br>"        
+            for region in regions:
+                print str(region)+"<br>"
+
+            
+            # <--- Find all permutations
+            
+            permutationSets = []
+            
+            for set in regions:          
+                block = day[set[0]][set[1]:set[2]+1]
+                permutations = itertools.permutations(block)
+                permutations = list(permutations)
+                permutationSets.append(permutations)
+            
+            
+     
+            # <---- Op basis van willekeurige permutaties 
+           
+            for loop in range(0):
+                    
+                for setIndex, set in enumerate(regions):          
+                    conflictCounter = []
+                    
+                    for perm in permutationSets[setIndex]:
+                        
+                        block = day[set[0]][set[1]:(set[2]+1)]
+                        day[set[0]][set[1]:(set[2]+1)] = perm
+                        
+                        conflicts = 0                    
+                        for i, slot in enumerate(day[0]):
+                            conflicts += len(planning.conflictedTeachers(day, i))
+                        conflictCounter.append(conflicts)
+                    
+                    lowestValue = min(conflictCounter)
+                    
+                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
+                    bestOption = random.choice(bestOptions)
+                    newList = permutationSets[setIndex][bestOption]
+                    day[set[0]][set[1]:set[2]+1] = newList
+                   
+                conflicts = 0
+                for i, slot in enumerate(day[0]):
+                    conflicts += len(planning.conflictedTeachers(day, i))
+                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+
+
+
+
+
+
+
+
+
+
+        planning.outputHTML()
         
-#        for day in planning.days:
-#            
-#            # <--- Build a list of all regions
-#        
-#            regions = []
-#            previousGuardian = None
-#            region = [None, None, None]
-#            for tableIndex, table in enumerate(day):
-#                for slotIndex, slot in enumerate(table):
-#                    guardianId = planning.getGuardianIdFromRequest(slot)
-#                    if previousGuardian == None:
-#                        region = [tableIndex, slotIndex, slotIndex]
-#                        if guardianId != "":
-#                            previousGuardian = guardianId
-#                    elif previousGuardian == guardianId:
-#                        region[2] = slotIndex
-#                    elif guardianId == "":
-#                        region[2] = slotIndex
-#                        regions.append(region)
-#                        previousGuardian = None
-#                    else:
-#                        regions.append(region)
-#                        region = [tableIndex, slotIndex, slotIndex]
-#                        previousGuardian = guardianId
-#
-#            
-#            # <--- Find all permutations
-#            
-#            permutationSets = []
-#            
-#            for set in regions:          
-#                block = day[set[0]][set[1]:set[2]+1]
-#                permutations = itertools.permutations(block)
-#                permutations = list(permutations)
-#                permutationSets.append(permutations)
-#            
-#            
-#     
-#            # <---- Op basis van willekeurige permutaties 
-#           
-#            for loop in range(10):
-#                    
-#                for setIndex, set in enumerate(regions):          
-#                    conflictCounter = []
-#                    
-#                    for perm in permutationSets[setIndex]:
-#                        
-#                        block = day[set[0]][set[1]:(set[2]+1)]
-#                        day[set[0]][set[1]:(set[2]+1)] = perm
-#                        
-#                        conflicts = 0                    
-#                        for i, slot in enumerate(day[0]):
-#                            conflicts += len(planning.conflictedTeachers(day, i))
-#                        conflictCounter.append(conflicts)
-#                    
-#                    lowestValue = min(conflictCounter)
-#                    
-#                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
-#                    bestOption = random.choice(bestOptions)
-#                    newList = permutationSets[setIndex][bestOption]
-#                    day[set[0]][set[1]:set[2]+1] = newList
-#                   
-#                conflicts = 0
-#                for i, slot in enumerate(day[0]):
-#                    conflicts += len(planning.conflictedTeachers(day, i))
-#                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
-#
-#        planning.outputHTML()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 #        for day in planning.days:
 #            myDay = []
 #            

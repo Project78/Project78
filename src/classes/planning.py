@@ -43,14 +43,11 @@ class Planning(object):
             nextEmpty = [self.nextNone(table) for table in day]
         
         for i, table in enumerate(day):
-#            if table.count(None) < length:
-            consecutiveNone = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
-            if len(consecutiveNone) > 0:
-                longestConsecutiveNone = max(consecutiveNone)
-            else:
-                longestConsecutiveNone = 0
-            
-            if longestConsecutiveNone < length:
+            longestContinuous = [len(list(y)) for (c,y) in itertools.groupby(table) if c==None]
+            if len(longestContinuous) == 0:
+                nextEmpty = 999
+            elif max(longestContinuous) < length+1:
+#            if max(len(list(y)) for (c,y) in itertools.groupby(table) if c==None) < length:
                 nextEmpty[i] = 999
         
         if min(nextEmpty) == 999:
@@ -63,6 +60,7 @@ class Planning(object):
     def place(self, guardian, day_num):
         length = len(guardian.requests)
         
+        # Make sure a teacher doesn't get too many appointments in one day
         for request in guardian.requests:
             if self.appointmentsPerDay(day_num, request.combination.teacher.key().name()) >= len(self.days[day_num][0]):
                 return False
@@ -76,24 +74,21 @@ class Planning(object):
         if nextTable == 999:
             return False
         
-        startingIndex = 999
-        
         nextTable = self.days[day_num][nextTable]
         if (reversed):
             for slotIndex, slot in enumerate(reverse(nextTable)):
-                if nextTable[slotIndex] == None and nextTable[slotIndex+1] == None:
-                    startingIndex = len(nextTable)-length-slotIndex
+                if nextTable[slotIndex] == None and nextTable[slotIndex-1] == None:
+                    startingIndex = len(nextTable)-length-slotIndex-1
                     break
+#                startingIndex = len(nextTable)-length-reverse(nextTable).index(None)
         else:
+#            startingIndex = nextTable.index(None)
             for slotIndex, slot in enumerate(nextTable):
                 if nextTable[slotIndex] == None and nextTable[slotIndex+1] == None:
-                    startingIndex = slotIndex
+                    startingIndex = slotIndex+1
                     break
-        
-        if startingIndex == 999:
-            return False
-        
-        
+                
+            
         for requestIndex, slotIndex in enumerate(range(startingIndex, startingIndex+length)):
             nextTable[slotIndex] = guardian.requests[requestIndex]
             nextTable[slotIndex].moveCounter=0
