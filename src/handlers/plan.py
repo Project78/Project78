@@ -133,26 +133,22 @@ class plan(webapp.RequestHandler):
                 if len(block) > block.count(None) > 0:
                     regions.append(region)
 
-
-            
             regions.sort(key=lambda set: set[2]-set[1])
             permutationSets = []
 
-            for setIndex, set in enumerate(regions):
+            for setIndex, set in enumerate(regions[0:35]):
                 block = day[set[0]][set[1]:set[2]+1]
                 permutations = itertools.permutations(block)
                 permutations = list(permutations)
                 permutationSets.append(permutations)
-                
-                print "setIndex: "+str(setIndex)+"<br>"
-                
-                for permutationSet in permutationSets:
+                                
+                for permutationSetIndex, permutationSet in enumerate(permutationSets):
                     
-                    conflictCounter = []            
+                    mySet = regions[permutationSetIndex]
+                    conflictCounter = []
                     for perm in permutationSet:
-                        if setIndex >= 16: planning.outputHTML()
-                        block = day[set[0]][set[1]:(set[2]+1)]
-                        day[set[0]][set[1]:(set[2]+1)] = perm
+                        block = day[mySet[0]][mySet[1]:(mySet[2]+1)]
+                        day[mySet[0]][mySet[1]:(mySet[2]+1)] = perm
                         
                         conflicts = 0                    
                         for i, slot in enumerate(day[0]):
@@ -163,13 +159,17 @@ class plan(webapp.RequestHandler):
                     
                     bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
                     bestOption = random.choice(bestOptions)
-                    newList = permutationSets[setIndex][bestOption]
-                    day[set[0]][set[1]:set[2]+1] = newList
+                    newList = permutationSet[bestOption]
+                    day[mySet[0]][mySet[1]:mySet[2]+1] = newList
                     
                     if lowestValue == 0:
                         break           
                 if lowestValue == 0:
+                    print "Woohoo!<br>"
                     break
+                print time.strftime("%H:%M:%S", time.localtime())+" - "+str(lowestValue)+"<br>"
+            
+            planning.outputHTML()
 
                                    
             
@@ -221,7 +221,6 @@ class plan(webapp.RequestHandler):
 #
 #
 #
-        planning.outputHTML()
 #        
 #        for dayIndex, day in enumerate(planning.days):
 #            for tableIndex, table in enumerate(day):

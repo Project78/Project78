@@ -106,9 +106,13 @@ class Planning(object):
 
 
     def conflictedTeachers(self, day, slotnumber):
+        
+#        print "slots in day: "+str([len(table) for table in day])+"<br>"
         sideways = zip(*day)
-        print "ontvangen slotnummer: "+str(slotnumber)+"<br>"
+#        print "slots in sideways: "+str(len(sideways))+"<br>"
+                
         slot = filter(lambda x: x != None, sideways[slotnumber])
+                        
         teachersInSlot = [table.combination.teacher.key().name() for table in slot]
         uniqueTeachers = set([table.combination.teacher.key().name() for table in slot])
         countAppointments = [teachersInSlot.count(teacher) for teacher in uniqueTeachers]
