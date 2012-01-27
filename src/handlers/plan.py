@@ -156,7 +156,6 @@ class plan(webapp.RequestHandler):
                     if lowestValue == 0:
                         break           
                 if lowestValue == 0:
-                    print "Woohoo!<br>"
                     break
             print time.strftime("%H:%M:%S", time.localtime())+": "+str(lowestValue)+"<br>"
         planning.outputHTML()
