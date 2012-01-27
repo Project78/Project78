@@ -29,25 +29,24 @@
 			</div>
 			<input type="submit" value="Zoek afspraak" name="search-appointment" /><br />
 		</form>
-		{% if days %}
+		{% if appointments %}
 		<div id="appointments">
 			<table>
-			{% for day in days %}	
+			{% for appointment in appointments %}	
+				{% if appointment %}
 				<!-- day -->
 				<tr>
 					<td>
-						<table>
-							<!-- table -->
-							{% for table in day.2 %}
-							<tr>
-								{% for slot in table.1.object_list %}	
-								<td>{{ slot }}</td>
-								{% endfor %}
-							</tr>
-							{% endfor %}
-						</table>
+						Datum: {{appointment.day.date.year}}-{{appointment.day.date.month}}-{{appointment.day.date.day}}
+					</td>
+					<td>
+						Tafel: {{appointment.table}}
+					</td>
+					<td>
+						Slot: {{appointment.slot}}
 					</td>
 				</tr>
+				{% endif %}
 			{% endfor %}
 			</table>
 		</div>		
