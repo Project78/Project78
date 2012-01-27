@@ -1,0 +1,56 @@
+{% extends "event-base.html" %}
+{% block javascript %}
+	{{ block.super }}
+	<script type="text/javascript" src="/static/js/common.js"></script>
+{% endblock %}
+{% block content %}
+	<div id="content" class="clearfix">
+		<div class="breadcrumb"><a href="/">Home</a> / <a href="/administratie">Overzicht ouderavondreeksen</a></div>
+		<h1>Overzicht ouderavondreeksen</h1>
+		{% if notifications %}
+		<div id="notifications">
+			<h2>Meldingen</h2>
+			<ul>
+				{% for notification in notifications %}
+				<li>{{ notification }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+		<form method="post" action="">
+			<div class="label-pair clearfix">
+				<label>Zoek op:</label>
+				<input type="radio" value="guardian" name="search-on"/> Voogd<br />
+				<label>&nbsp;</label>
+				<input type="radio" value="teacher" name="search-on"/> Docent<br />
+			</div>
+			<div class="label-pair clearfix">	
+				<label>Voogdnummer of Docentcode:</label><input type="text" name="search-code" /><br />
+			</div>
+			<input type="submit" value="Zoek afspraak" name="search-appointment" /><br />
+		</form>
+		{% if days %}
+		<div id="appointments">
+			<table>
+			{% for day in days %}	
+				<!-- day -->
+				<tr>
+					<td>
+						<table>
+							<!-- table -->
+							{% for table in day.2 %}
+							<tr>
+								{% for slot in table.1.object_list %}	
+								<td>{{ slot }}</td>
+								{% endfor %}
+							</tr>
+							{% endfor %}
+						</table>
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>		
+		{% endif %}
+	</div>
+{% endblock %}

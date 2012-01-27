@@ -168,6 +168,94 @@ class AdministrationGenerateGuardianKeys(webapp.RequestHandler):
             sD.passphrase = binascii.b2a_hex(os.urandom(15))
             sD.put()
 
+class AdministrationShowAppointmentHandler(webapp.RequestHandler):
+    
+    def get(self, arg):
+        notifications = []
+        path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+        template_values = {
+            'notifications': notifications, 
+            'logoutlink': users.create_logout_url("/") 
+        }
+        self.response.out.write(template.render(path, template_values))
+        return
+    
+    def post(self, arg):
+        event = Event.get_by_id(int(arg))
+        if not event:
+            #todo
+            '''event bestaat niet'''
+            return
+        
+        code = self.request.POST['search-code']
+        method = self.request.POST['search-on']
+        
+        if method == 'guardian':
+            guardian = Guardian.get_by_key_name(code)
+            if not guardian:
+                print 'geen guardian met appointment'
+            
+            requests = guardian.all_requests.filter('event', event).fetch(999)
+            appointments = [request.appointment.get() for request in requests]
+            
+            days = []
+            for appointment in appointments:
+                found = False
+                for day in days:
+                    if day.key().id() == appointment.day.key().id():
+                        found = True
+                        break
+                if not found:
+                    days.append(appointment.day)
+            
+            days_appointments = []
+            for day in days:
+                appointments_in_day = []
+                for appointment in appointments:
+                    if appointment.day.key().id() == day.key().id():
+                        appointments_in_day.append(appointment)
+                
+                days_appointments.append([day, appointments_in_day])
+            
+            days_tables_appointments = []
+            for day_appointments in days_appointments:
+                tables = []
+                for appointment in day_appointments[1]:
+                    if appointment.table not in tables:
+                        tables.append(int(appointment.table))
+                
+                day_tables = []
+                for table in tables:
+                    table_appointments = []
+                    for appointment in day_appointments[1]:
+                        if int(appointment.table) == table:
+                            table_appointments.append(appointment)
+                    day_tables.append([table, table_appointments])
+                days_tables_appointments.append([day_appointments[0], day_tables])
+                
+            day_tables_slots = []
+            for day_tables_appointments in days_tables_appointments:
+                
+                for table_appointments in day_tables_appointments[1]:
+                    table_slots = []
+                    for slot in range(1, day_tables_appointments[0].talks+1):
+                        added = False
+                        for appointment in table_appointments[1]:
+                            if(int(appointment.slot) == slot):
+                                added = True
+                                table_slots.append(appointment)
+                        if not added:
+                            table_slots.append(1)
+                    day_tables_slots.append([day_tables_appointments[0], [table_appointments[0], table_slots]])
+        notifications = []
+        path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+        template_values = {
+            'days': day_tables_slots,
+            'notifications': notifications, 
+            'logoutlink': users.create_logout_url("/") 
+        }
+        self.response.out.write(template.render(path, template_values))
+
 class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
     
     def get(self, arg):

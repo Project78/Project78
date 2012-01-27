@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div id="content" class="clearfix">
-		<div class="breadcrumb"><a href="/administratie">Administratie</a> / <a href="/administratie/events">Overzicht ouderavondreeksen</a></div>
+		<div class="breadcrumb"><a href="/">Home</a> / <a href="/administratie">Overzicht ouderavondreeksen</a></div>
 		<h1>Overzicht ouderavondreeksen</h1>
 		{% if notifications %}
 		<div id="notifications">
@@ -32,7 +32,8 @@
 						<li><a href="/administratie/event/{{event.key.id}}/genereer-voogd-sleutels">Genereer de voogdsleutels</a></li>
 						<li><a href="/administratie/event/{{event.key.id}}/verstuur-uitnodigingen">E-mail de voogdsleutels</a></li>
 						<li><a href="/administratie/event/{{event.key.id}}/genereer-planning">Geneneer planning</a></li>
-						<li><a href="/administratie/event/{{event.key.id}}/genereer-planning">E-mail de afspraken</a></li>
+						<li><a href="/administratie/event/{{event.key.id}}/...">E-mail de afspraken</a></li>
+						<li><a href="/administratie/event/{{event.key.id}}/afspraken">Bekijk de afspraken voor dit event</a></li>
 					</ul>
 				</div>
 			</li>
