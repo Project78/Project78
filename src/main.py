@@ -49,7 +49,6 @@ from handlers.mailevent import MailHandler
 from handlers.subscribe import SubscriptionHandler
 from handlers.subscribe import SubscriptionLoginHandler
 from handlers.subscribe import SubscriptionLogoutHandler
-from handlers.administration import AdministrationIndexHandler
 
 class IndexHandler(webapp.RequestHandler):
     def get(self):
