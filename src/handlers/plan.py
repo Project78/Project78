@@ -25,17 +25,16 @@ from classes.planning import Planning
 
 
 class plan(webapp.RequestHandler):
-#    def get(self, arg):
-    def get(self):
+    def get(self, arg):
         
         print ""
         print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
         print time.strftime("%H:%M:%S", time.localtime())+": Start<br>"
         
-#        if arg != None:
-#            event = Event.get_by_id(int(arg))
-#        else:
-        event = Event.all().filter("event_name", "paasrapport").get()
+        if arg != None:
+            event = Event.get_by_id(int(arg))
+        else:
+            event = Event.all().filter("event_name", "paasrapport").get()
             
         days = Day.all().filter("event", event).fetch(999)
         days.sort(key=lambda day: day.date)
@@ -167,67 +166,15 @@ class plan(webapp.RequestHandler):
                 if lowestValue == 0:
                     print "Woohoo!<br>"
                     break
-                print time.strftime("%H:%M:%S", time.localtime())+" - "+str(lowestValue)+"<br>"
             
-            planning.outputHTML()
-
-                                   
-            
-#            # <--- Find all permutations
-#            
-#            permutationSets = []
-#            
-#            for set in regions:          
-#                block = day[set[0]][set[1]:set[2]+1]
-#                permutations = itertools.permutations(block)
-#                permutations = list(permutations)
-#                permutationSets.append(permutations)
-#            
-#            
-#     
-#            # <---- Op basis van willekeurige permutaties 
-#           
-#            for loop in range(1):
-#                    
-#                for setIndex, set in enumerate(regions):          
-#                    conflictCounter = []
-#                    
-#                    for perm in permutationSets[setIndex]:
-#                        
-#                        block = day[set[0]][set[1]:(set[2]+1)]
-#                        day[set[0]][set[1]:(set[2]+1)] = perm
-#                        
-#                        conflicts = 0                    
-#                        for i, slot in enumerate(day[0]):
-#                            conflicts += len(planning.conflictedTeachers(day, i))
-#                        conflictCounter.append(conflicts)
-#                    
-#                    lowestValue = min(conflictCounter)
-#                    
-#                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
-#                    bestOption = random.choice(bestOptions)
-#                    newList = permutationSets[setIndex][bestOption]
-#                    day[set[0]][set[1]:set[2]+1] = newList
-#                    if lowestValue == 0:
-#                        break
-#                   
-#                conflicts = 0
-#                for i, slot in enumerate(day[0]):
-#                    conflicts += len(planning.conflictedTeachers(day, i))
-#                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
-#                if conflicts == 0:
-#                    break
-#
-#
-#
-#
-#        
-#        for dayIndex, day in enumerate(planning.days):
-#            for tableIndex, table in enumerate(day):
-#                for slotIndex, slot in enumerate(table):
-#                    if slot != None:
-#                        new_appointment = Appointment(request=slot,
-#                                                      day=days[dayIndex],
-#                                                      table=tableIndex,
-#                                                      slot=slotIndex)
-#                        new_appointment.put()
+        planning.outputHTML()
+     
+        for dayIndex, day in enumerate(planning.days):
+            for tableIndex, table in enumerate(day):
+                for slotIndex, slot in enumerate(table):
+                    if slot != None:
+                        new_appointment = Appointment(request=slot,
+                                                      day=days[dayIndex],
+                                                      table=tableIndex,
+                                                      slot=slotIndex)
+                        new_appointment.put()
