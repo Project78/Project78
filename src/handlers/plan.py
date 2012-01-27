@@ -136,7 +136,7 @@ class plan(webapp.RequestHandler):
             regions.sort(key=lambda set: set[2]-set[1])
             permutationSets = []
 
-            for setIndex, set in enumerate(regions[0:35]):
+            for setIndex, set in enumerate(regions):
                 block = day[set[0]][set[1]:set[2]+1]
                 permutations = itertools.permutations(block)
                 permutations = list(permutations)
