@@ -208,10 +208,7 @@ class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
             
             mail.sendMail(guardian.email, 'Uitnodiging ouderavond(en) ' + event.event_name, message)       
         
-        mail.sendMail('t.nieuwenhuys@hotmail.com', 'test', 'test') 
-        
         self.redirect('/administratie')
-        
     
     def getMonthText(self, i):
         return {
