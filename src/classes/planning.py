@@ -106,9 +106,8 @@ class Planning(object):
 
 
     def conflictedTeachers(self, day, slotnumber):
-        if slotnumber > 11 or slotnumber < 0:
-            print "planning.conflictedTeachers - ontvangen slotnumber: "+str(slotnumber)+"<br>"
         sideways = zip(*day)
+        print "ontvangen slotnummer: "+str(slotnumber)+"<br>"
         slot = filter(lambda x: x != None, sideways[slotnumber])
         teachersInSlot = [table.combination.teacher.key().name() for table in slot]
         uniqueTeachers = set([table.combination.teacher.key().name() for table in slot])

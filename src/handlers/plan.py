@@ -25,16 +25,17 @@ from classes.planning import Planning
 
 
 class plan(webapp.RequestHandler):
-    def get(self, arg):
+#    def get(self, arg):
+    def get(self):
         
         print ""
         print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
         print time.strftime("%H:%M:%S", time.localtime())+": Start<br>"
         
-        if arg != None:
-            event = Event.get_by_id(int(arg))
-        else:
-            event = Event.all().filter("event_name", "paasrapport").get()
+#        if arg != None:
+#            event = Event.get_by_id(int(arg))
+#        else:
+        event = Event.all().filter("event_name", "paasrapport").get()
             
         days = Day.all().filter("event", event).fetch(999)
         days.sort(key=lambda day: day.date)
@@ -117,7 +118,8 @@ class plan(webapp.RequestHandler):
                                 regions.append(region)
                                 region = [tableIndex, 0, -1]
                         elif block.count(None) > 0:
-                            regions.append(region)
+                            if len(block) > block.count(None):
+                                regions.append(region)
                             region = [tableIndex, slotIndex, slotIndex]
                         previousGuardian = ""
                     else:
@@ -128,31 +130,27 @@ class plan(webapp.RequestHandler):
                         previousGuardian = guardianId
                                 
                 block = table[region[1]:region[2]+1]
-                if len(block) > 0:
+                if len(block) > block.count(None) > 0:
                     regions.append(region)
 
+
             
-            # <--- Find all permutations
-            
+            regions.sort(key=lambda set: set[2]-set[1])
             permutationSets = []
-            
-            for set in regions:          
+
+            for setIndex, set in enumerate(regions):
                 block = day[set[0]][set[1]:set[2]+1]
                 permutations = itertools.permutations(block)
                 permutations = list(permutations)
                 permutationSets.append(permutations)
-            
-            
-     
-            # <---- Op basis van willekeurige permutaties 
-           
-            for loop in range(1):
+                
+                print "setIndex: "+str(setIndex)+"<br>"
+                
+                for permutationSet in permutationSets:
                     
-                for setIndex, set in enumerate(regions):          
-                    conflictCounter = []
-                    
-                    for perm in permutationSets[setIndex]:
-                        
+                    conflictCounter = []            
+                    for perm in permutationSet:
+                        if setIndex >= 16: planning.outputHTML()
                         block = day[set[0]][set[1]:(set[2]+1)]
                         day[set[0]][set[1]:(set[2]+1)] = perm
                         
@@ -167,27 +165,70 @@ class plan(webapp.RequestHandler):
                     bestOption = random.choice(bestOptions)
                     newList = permutationSets[setIndex][bestOption]
                     day[set[0]][set[1]:set[2]+1] = newList
+                    
                     if lowestValue == 0:
-                        break
-                   
-                conflicts = 0
-                for i, slot in enumerate(day[0]):
-                    conflicts += len(planning.conflictedTeachers(day, i))
-                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
-                if conflicts == 0:
+                        break           
+                if lowestValue == 0:
                     break
 
-
-
-
+                                   
+            
+#            # <--- Find all permutations
+#            
+#            permutationSets = []
+#            
+#            for set in regions:          
+#                block = day[set[0]][set[1]:set[2]+1]
+#                permutations = itertools.permutations(block)
+#                permutations = list(permutations)
+#                permutationSets.append(permutations)
+#            
+#            
+#     
+#            # <---- Op basis van willekeurige permutaties 
+#           
+#            for loop in range(1):
+#                    
+#                for setIndex, set in enumerate(regions):          
+#                    conflictCounter = []
+#                    
+#                    for perm in permutationSets[setIndex]:
+#                        
+#                        block = day[set[0]][set[1]:(set[2]+1)]
+#                        day[set[0]][set[1]:(set[2]+1)] = perm
+#                        
+#                        conflicts = 0                    
+#                        for i, slot in enumerate(day[0]):
+#                            conflicts += len(planning.conflictedTeachers(day, i))
+#                        conflictCounter.append(conflicts)
+#                    
+#                    lowestValue = min(conflictCounter)
+#                    
+#                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
+#                    bestOption = random.choice(bestOptions)
+#                    newList = permutationSets[setIndex][bestOption]
+#                    day[set[0]][set[1]:set[2]+1] = newList
+#                    if lowestValue == 0:
+#                        break
+#                   
+#                conflicts = 0
+#                for i, slot in enumerate(day[0]):
+#                    conflicts += len(planning.conflictedTeachers(day, i))
+#                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
+#                if conflicts == 0:
+#                    break
+#
+#
+#
+#
         planning.outputHTML()
-        
-        for dayIndex, day in enumerate(planning.days):
-            for tableIndex, table in enumerate(day):
-                for slotIndex, slot in enumerate(table):
-                    if slot != None:
-                        new_appointment = Appointment(request=slot,
-                                                      day=days[dayIndex],
-                                                      table=tableIndex,
-                                                      slot=slotIndex)
-                        new_appointment.put()
+#        
+#        for dayIndex, day in enumerate(planning.days):
+#            for tableIndex, table in enumerate(day):
+#                for slotIndex, slot in enumerate(table):
+#                    if slot != None:
+#                        new_appointment = Appointment(request=slot,
+#                                                      day=days[dayIndex],
+#                                                      table=tableIndex,
+#                                                      slot=slotIndex)
+#                        new_appointment.put()

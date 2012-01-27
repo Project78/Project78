@@ -314,7 +314,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 
         # Add an event
         event = Event(event_name="paasrapport",
-                      tables=40,
+                      tables=10,
                       talk_time=15)
         event.put()
 
@@ -335,7 +335,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
 #        day.put()
         
         guardians = Guardian.all().fetch(99999999)
-        samplesize = int(len(guardians)/3)
+        samplesize = int(len(guardians)/12)
         guardians = random.sample(guardians, samplesize)
         for guardian in guardians:
             time = TimePreference()
