@@ -14,6 +14,8 @@ from google.appengine.api import users
 from models.event import Event
 from models.day import Day
 from models.guardian import Guardian
+from models.teacher import Teacher
+from models.request import Request
 from models.subscriptiondetails import SubscriptionDetails
 from copy import deepcopy
 
@@ -185,67 +187,76 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
         code = self.request.POST['search-code']
         method = self.request.POST['search-on']
         
+        appointments = []
         if method == 'guardian':
             guardian = Guardian.get_by_key_name(code)
-            if not guardian:
-                print 'geen guardian met appointment'
+            if guardian:
+                requests = guardian.all_requests.filter('event', event).fetch(999)
+                appointments = [request.appointment.get() for request in requests]
             
-            requests = guardian.all_requests.filter('event', event).fetch(999)
-            appointments = [request.appointment.get() for request in requests]
-            
-            days = []
-            for appointment in appointments:
-                found = False
-                for day in days:
-                    if day.key().id() == appointment.day.key().id():
-                        found = True
-                        break
-                if not found:
-                    days.append(appointment.day)
-            
-            days_appointments = []
-            for day in days:
-                appointments_in_day = []
-                for appointment in appointments:
-                    if appointment.day.key().id() == day.key().id():
-                        appointments_in_day.append(appointment)
-                
-                days_appointments.append([day, appointments_in_day])
-            
-            days_tables_appointments = []
-            for day_appointments in days_appointments:
-                tables = []
-                for appointment in day_appointments[1]:
-                    if appointment.table not in tables:
-                        tables.append(int(appointment.table))
-                
-                day_tables = []
-                for table in tables:
-                    table_appointments = []
-                    for appointment in day_appointments[1]:
-                        if int(appointment.table) == table:
-                            table_appointments.append(appointment)
-                    day_tables.append([table, table_appointments])
-                days_tables_appointments.append([day_appointments[0], day_tables])
-                
-            day_tables_slots = []
-            for day_tables_appointments in days_tables_appointments:
-                
-                for table_appointments in day_tables_appointments[1]:
-                    table_slots = []
-                    for slot in range(1, day_tables_appointments[0].talks+1):
-                        added = False
-                        for appointment in table_appointments[1]:
-                            if(int(appointment.slot) == slot):
-                                added = True
-                                table_slots.append(appointment)
-                        if not added:
-                            table_slots.append(1)
-                    day_tables_slots.append([day_tables_appointments[0], [table_appointments[0], table_slots]])
+#            days = []
+#            for appointment in appointments:
+#                found = False
+#                for day in days:
+#                    if day.key().id() == appointment.day.key().id():
+#                        found = True
+#                        break
+#                if not found:
+#                    days.append(appointment.day)
+#            
+#            days_appointments = []
+#            for day in days:
+#                appointments_in_day = []
+#                for appointment in appointments:
+#                    if appointment.day.key().id() == day.key().id():
+#                        appointments_in_day.append(appointment)
+#                
+#                days_appointments.append([day, appointments_in_day])
+#            
+#            days_tables_appointments = []
+#            for day_appointments in days_appointments:
+#                tables = []
+#                for appointment in day_appointments[1]:
+#                    if appointment.table not in tables:
+#                        tables.append(int(appointment.table))
+#                
+#                day_tables = []
+#                for table in tables:
+#                    table_appointments = []
+#                    for appointment in day_appointments[1]:
+#                        if int(appointment.table) == table:
+#                            table_appointments.append(appointment)
+#                    day_tables.append([table, table_appointments])
+#                days_tables_appointments.append([day_appointments[0], day_tables])
+#                
+#            day_tables_slots = []
+#            for day_tables_appointments in days_tables_appointments:
+#                
+#                for table_appointments in day_tables_appointments[1]:
+#                    table_slots = []
+#                    for slot in range(1, day_tables_appointments[0].talks+1):
+#                        added = False
+#                        for appointment in table_appointments[1]:
+#                            if(int(appointment.slot) == slot):
+#                                added = True
+#                                table_slots.append(appointment)
+#                        if not added:
+#                            table_slots.append(1)
+#                    day_tables_slots.append([day_tables_appointments[0], [table_appointments[0], table_slots]])
+        elif method == 'teacher':
+            teacher = Teacher.get_by_key_name(code.upper())
+            if teacher:
+                subjects = teacher.subjects.fetch(999)
+                requests = []
+                for subject in subjects:
+                    reqs = subject.requests.fetch(999)
+                    for req in reqs:
+                        requests.append(req)
+                appointments = [request.appointment.get() for request in requests]
         notifications = []
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
         template_values = {
-            'days': day_tables_slots,
+            'appointments': appointments,
             'notifications': notifications, 
             'logoutlink': users.create_logout_url("/") 
         }
