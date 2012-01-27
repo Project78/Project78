@@ -34,7 +34,7 @@ class MailHandler(webapp.RequestHandler):
                 self.attach = self.request.POST['attach']
             except KeyError:
                 self.attach = ''
-                
+              
             user = users.get_current_user()
             if user is None:
                 login_url = users.create_login_url(self.request.path)
@@ -66,5 +66,29 @@ class MailHandler(webapp.RequestHandler):
                             message.attachments = [(self.title + '.pdf', pdf)]
 #                            print pdf
                     message.Send()
-                    print 'E-mail sent to %s' % to_addr
+#                    print 'E-mail sent to %s' % to_addr
+            
+            HTMLTEST = """
+            <html><body>
+            <p>Hello <strong style="color: #f00;">World</strong>
+            <hr>
+            <table border="1" style="background: #eee; padding: 0.5em;">
+                <tr>
+                    <td>Amount</td>
+                    <td>Description</td>
+                    <td>Total</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Good weather</td>
+                    <td>0 EUR</td>
+                </tr>
+                <tr style="font-weight: bold">
+                    <td colspan="2" align="right">Sum</td>
+                    <td>0 EUR</td>
+                </tr>
+            </table>
+            </body></html>
+            """
+            print CreatePDF().HTML2PDF(HTMLTEST, open=True)
     
