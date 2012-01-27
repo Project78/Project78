@@ -1,16 +1,24 @@
-<html>
-<head>
-<title>Home</title>
-</head>
+{% extends 'base.html' %}
 
-<body>
-<h1>Hoofdmenu</h1>
-<p><a href="/inschrijven">Inschrijven</a></p>
-<p><a href="/inschrijvingen">Inschrijvingen bekijken</a></p>
-<p><a href="/fill">Vul database met test info</a></p>
-<p><a href="/administratie">Eventlijst tonen</a></p>
-<p><a href="/administratie/event/nieuw">Event toevoegen</a></p>
-
-</body>
-
-</html> 
+{% block body %}
+<div id="wrapper">
+	{% block header %}
+	<div id="header" class="clearfix">
+		<div id="logo"><img src="/static/images/logo.png" alt="Donald Knuth College" title="Donald Knuth College" width="196" height="100" /></div>
+		<div id="slogan"><h1>Donald Knuth College</h1><p>Placeholder</p></div>
+		<div id="fontScaling"><a class="scale1" href="javascript:resizeFonts(0);">A</a> <a class="scale2" href="javascript:resizeFonts(1);">A</a> <a class="scale3" href="javascript:resizeFonts(2);">A</a></div>
+		{% if logoutlink %}<div id="logout"><a href="{{ logoutlink }}">Uitloggen</a></div>{% endif %}
+	</div>
+	{% endblock %}
+	<div id="content">
+		<h1>{Placeholder voor de normale website}</h1>
+		<ul class="administration-links">
+			<li><a href="{{ loginlink }}">Inloggen als administrator</a></li>
+			<li><a href="/clear">Leeg de database</a></li>
+			<li><a href="/init">Vul de database</a></li>
+			<li><a href="/fix">Verdeel de docenten opnieuw (fix)</a></li>
+			<li><a href="/inschrijven">Inschrijven</a></li>
+		</ul>
+	</div>
+</div>
+{% endblock %}

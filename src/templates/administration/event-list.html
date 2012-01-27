@@ -4,17 +4,35 @@
 	<div id="content" class="clearfix">
 		<div class="breadcrumb"><a href="/administratie">Administratie</a> / <a href="/administratie/events">Overzicht ouderavondreeksen</a></div>
 		<h1>Overzicht ouderavondreeksen</h1>
+		{% if notifications %}
+		<div id="notifications">
+			<h2>Meldingen</h2>
+			<ul>
+				{% for notification in notifications %}
+				<li>{{ notification }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
 		<ul id="event-list">
 			{% for event in events %}
 			<li class="event-entry clearfix">
 				<div class="title">
-					<b><a href="/administratie/event/{{event.key.id}}">{{event.event_name}}</b></a><br />
+					<b><a href="/administratie/event/{{event.key.id}}">{{event.event_name}}</a></b><br />
 				</div>
 				<div class="dates">
 					<ul>
 						{% for day in event.days %}
 						<li>{{day.date.year}}-{{day.date.month}}-{{day.date.day}}</td><td>&nbsp;{{day.date.hour}}:{{day.date.minute}}{% ifequal day.date.minute 0 %}0{% endifequal %} - {{day.end_time.hour}}:{{day.end_time.minute}}{% ifequal day.end_time.minute 0 %}0{% endifequal %}</li>
 						{% endfor %}	
+					</ul>
+				</div>
+				<div class="dates">
+					<ul>
+						<li><a href="/administratie/event/{{event.key.id}}/genereer-voogd-sleutels">Genereer de voogdsleutels</a></li>
+						<li><a href="/administratie/event/{{event.key.id}}/verstuur-uitnodigingen">E-mail de voogdsleutels</a></li>
+						<li><a href="/administratie/event/{{event.key.id}}/genereer-planning">Geneneer planning</a></li>
+						<li><a href="/administratie/event/{{event.key.id}}/genereer-planning">E-mail de afspraken</a></li>
 					</ul>
 				</div>
 			</li>

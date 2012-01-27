@@ -18,7 +18,6 @@ class MailHandler(webapp.RequestHandler):
     
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-mail.html')
-        
         self.response.out.write(template.render(path, {}))
         
     def post(self):        
