@@ -19,13 +19,6 @@ from copy import deepcopy
 
 from classes.Email import Email
 
-class AdministrationIndexHandler(webapp.RequestHandler):
-
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../templates/administration/administration-index.html')
-        template_values = {'logoutlink': users.create_logout_url("/") }
-        self.response.out.write(template.render(path, {template_values}))
-
 class AdministrationEventListHandler(webapp.RequestHandler):
     
     def get(self):
