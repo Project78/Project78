@@ -117,7 +117,8 @@ class plan(webapp.RequestHandler):
                                 regions.append(region)
                                 region = [tableIndex, 0, -1]
                         elif block.count(None) > 0:
-                            regions.append(region)
+                            if len(block) > block.count(None):
+                                regions.append(region)
                             region = [tableIndex, slotIndex, slotIndex]
                         previousGuardian = ""
                     else:
@@ -128,33 +129,25 @@ class plan(webapp.RequestHandler):
                         previousGuardian = guardianId
                                 
                 block = table[region[1]:region[2]+1]
-                if len(block) > 0:
+                if len(block) > block.count(None) > 0:
                     regions.append(region)
 
-            
-            # <--- Find all permutations
-            
+            regions.sort(key=lambda set: set[2]-set[1])
             permutationSets = []
-            
-            for set in regions:          
+
+            for setIndex, set in enumerate(regions):
                 block = day[set[0]][set[1]:set[2]+1]
                 permutations = itertools.permutations(block)
                 permutations = list(permutations)
                 permutationSets.append(permutations)
-            
-            
-     
-            # <---- Op basis van willekeurige permutaties 
-           
-            for loop in range(1):
+                                
+                for permutationSetIndex, permutationSet in enumerate(permutationSets):
                     
-                for setIndex, set in enumerate(regions):          
+                    mySet = regions[permutationSetIndex]
                     conflictCounter = []
-                    
-                    for perm in permutationSets[setIndex]:
-                        
-                        block = day[set[0]][set[1]:(set[2]+1)]
-                        day[set[0]][set[1]:(set[2]+1)] = perm
+                    for perm in permutationSet:
+                        block = day[mySet[0]][mySet[1]:(mySet[2]+1)]
+                        day[mySet[0]][mySet[1]:(mySet[2]+1)] = perm
                         
                         conflicts = 0                    
                         for i, slot in enumerate(day[0]):
@@ -165,23 +158,17 @@ class plan(webapp.RequestHandler):
                     
                     bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
                     bestOption = random.choice(bestOptions)
-                    newList = permutationSets[setIndex][bestOption]
-                    day[set[0]][set[1]:set[2]+1] = newList
+                    newList = permutationSet[bestOption]
+                    day[mySet[0]][mySet[1]:mySet[2]+1] = newList
+                    
                     if lowestValue == 0:
-                        break
-                   
-                conflicts = 0
-                for i, slot in enumerate(day[0]):
-                    conflicts += len(planning.conflictedTeachers(day, i))
-                print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
-                if conflicts == 0:
+                        break           
+                if lowestValue == 0:
+                    print "Woohoo!<br>"
                     break
-
-
-
-
+            
         planning.outputHTML()
-        
+     
         for dayIndex, day in enumerate(planning.days):
             for tableIndex, table in enumerate(day):
                 for slotIndex, slot in enumerate(table):
