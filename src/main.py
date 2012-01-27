@@ -30,6 +30,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 from google.appengine.api.datastore import Key
 from google.appengine.ext import db
+from google.appengine.api import users
 
 from models.event import Event
 from models.day import Day
@@ -41,7 +42,6 @@ from models.teacher import Teacher
 from models.subject import Subject
 from models.combination import Combination
 from models.request import Request
-from handlers.editevent import EditEvent
 from handlers.plan import plan
 from handlers.test import test
 from handlers.fixteachers import FixTeachers
@@ -55,6 +55,7 @@ class IndexHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
         template_values = {
+            'loginlink': users.create_login_url('administratie'),
             'greetings': "Hi"
         }
         self.response.out.write(template.render(path, template_values))

@@ -9,7 +9,7 @@ handlers:
 
 - url: /administratie(/.*)?
   script: admin.py
+  login: admin
 
 - url: .*
   script: main.py
-  login: admin

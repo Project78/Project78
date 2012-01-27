@@ -10,6 +10,7 @@ import binascii
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.api import users
 from models.event import Event
 from models.day import Day
 from models.guardian import Guardian
@@ -20,14 +21,15 @@ class AdministrationIndexHandler(webapp.RequestHandler):
 
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/administration-index.html')
-        self.response.out.write(template.render(path, {}))
+        template_values = {'logoutlink': users.create_logout_url("/") }
+        self.response.out.write(template.render(path, {template_values}))
 
 class AdministrationEventListHandler(webapp.RequestHandler):
     
     def get(self):
         events = Event.all()
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-list.html')
-        template_values = {'events': events }
+        template_values = {'events': events, 'logoutlink': users.create_logout_url("/") }
         self.response.out.write(template.render(path, template_values))
 
 class AdministrationEventEditHandler(webapp.RequestHandler):
@@ -42,7 +44,8 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
             tV = {
                 'event': event,
                 'day': day,
-                'monthText': monthText         
+                'monthText': monthText,
+                'logoutlink': users.create_logout_url("/")         
             }
             path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
             self.response.out.write(template.render(path, tV))
@@ -50,7 +53,7 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
         #first call of new event
         elif arg == 'nieuw':
             path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-edit.html')
-            self.response.out.write(template.render(path, {}))
+            self.response.out.write(template.render(path, {'logoutlink': users.create_logout_url("/")}))
             
             
     def post(self, arg):
@@ -91,7 +94,8 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
                       'errors': errors,
                       'event': nE,
                       'day': nDs[0],
-                      'monthText': monthText  
+                      'monthText': monthText,
+                      'logoutlink': users.create_logout_url("/")  
                 }
                 self.response.out.write(template.render(path, tv))
             
@@ -115,8 +119,6 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
                     d.updateEndTime()
                     d.put()
                 
-                if arg == 'nieuw':
-                    self.createGuardianPasses(nE)
                 self.redirect('/administratie')
     
     def getMonthText(self, i):
@@ -134,6 +136,28 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
             11: 'november',
             12: 'december'
         }.get(i, '')
+
+class AdministrationGenerateGuardianKeys(webapp.RequestHandler):
+    
+    def get(self, arg):
+        event = Event.get_by_id(int(arg))
+        notifications = []
+        events = Event.all()
+        path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-list.html')
+        template_values = {
+            'notifications': notifications, 
+            'events': events, 
+            'logoutlink': users.create_logout_url("/") 
+        }
+        if not event:
+            notifications.append('Het event bestaat niet.')
+            self.response.out.write(template.render(path, template_values))
+            return
+        
+        self.createGuardianPasses(event)
+        notifications.append('De sleutels zijn aangemaakt')
+        self.response.out.write(template.render(path, template_values))
+        return
         
     def createGuardianPasses(self, event):
         for g in Guardian.all():
@@ -144,8 +168,11 @@ class AdministrationEventEditHandler(webapp.RequestHandler):
             sD.passphrase = binascii.b2a_hex(os.urandom(15))
             sD.put()
 
-
-
+class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
+    
+    def get(self, arg):
+        return     
+    
 class Validator:
     def vDate(self, d):
         if re.match(r'\d{4}-\d{2}-\d{2}', d):
