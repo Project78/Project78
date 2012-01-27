@@ -314,29 +314,27 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 
         # Add an event
         event = Event(event_name="paasrapport",
-                      tables=10,
+                      tables=40,
                       talk_time=15)
         event.put()
 
         # Add some days to the aforementioned event
         day = Day(date=datetime.datetime(year=2011, month=11, day=11, hour=20, minute=00),
-                      talks=10,
+                      talks=12,
                       event=event)
         day.put()
 
         day = Day(date=datetime.datetime(year=2011, month=11, day=12, hour=20, minute=00),
-                      talks=10,
+                      talks=12,
                       event=event)
         day.put()
 
         day = Day(date=datetime.datetime(year=2011, month=11, day=13, hour=20, minute=00),
-                      talks=10,
+                      talks=12,
                       event=event)
         day.put()
         
         guardians = Guardian.all().fetch(99999999)
-        samplesize = int(len(guardians)/4)
-        guardians = random.sample(guardians, samplesize)
         for guardian in guardians:
             time = TimePreference()
             time.event = event
@@ -353,22 +351,7 @@ class GenerateRandomEventHandler(webapp.RequestHandler):
                 day_pref.save()
             for child in guardian.children:
                 subjects = Combination.all().filter('class_id', child.class_id).fetch(999)
-#                slots = 0
-#                for day in event.days:
-#                    slots += day.talks
-#                print ""
-#                print slots
-#                
-#                print len(subjects)
-#                
-#                for comb in subjects:
-#                    if comb.teacher.isFull(event):
-#                        print "Leraar heeft al genoeg verzoeken."
-#                        subjects.remove(comb)
                 selection = random.sample(subjects, int(random.triangular(0, 4, 0)))
-#                
-#                print len(subjects)
-                
                 for choice in selection:
                     request = Request()
                     request.event = event

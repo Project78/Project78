@@ -29,7 +29,6 @@ class plan(webapp.RequestHandler):
         
         print ""
         print "<html><body style='font-family: Helvetica; font-size: 0.9em;'>"
-        print time.strftime("%H:%M:%S", time.localtime())+": Start<br>"
         
         if arg != None:
             event = Event.get_by_id(int(arg))
@@ -63,8 +62,6 @@ class plan(webapp.RequestHandler):
         
         planning = Planning(event, days)
         
-        print time.strftime("%H:%M:%S", time.localtime())+": All guardians/requests collected<br>"
-        
         for length in range (max_requests, 0, -1):
             for timepref in timepref_options:
                 for rank in range(0, max_rank+1):
@@ -73,9 +70,6 @@ class plan(webapp.RequestHandler):
                                            and (guardian.time_pref.preference == timepref) 
                                            and (filter(lambda day_pref: day_pref.day.date == day.date, guardian.day_prefs)[0].rank == rank),
                                            guardians):
-                            # print "timepref: " + str(timepref) + " - length: " + str(length) + " - day_num: " + str(day_num) + " - ranked: " + str(rank) + " guardian: "+guardian.title +" "+ guardian.lastname
-                            # print guardian.title +" "+ guardian.lastname +" wil op "+day.date.strftime("%d-%m-%y")+" praten over " + str(len(guardian.requests)) + " vakken"
-                                
                             # try to place these requests     
                             placed = planning.place(guardian, day_num)
                             
@@ -84,16 +78,11 @@ class plan(webapp.RequestHandler):
                             if (placed):
                                 guardians.remove(guardian)
                
-        print time.strftime("%H:%M:%S", time.localtime())+": Placed<br>"
-
-        planning.outputHTML()        
-
         for day in planning.days:
             
             conflicts = 0
             for i, slot in enumerate(day[0]):
                 conflicts += len(planning.conflictedTeachers(day, i))
-            print time.strftime("%H:%M:%S", time.localtime())+": "+str(conflicts)+"<br>"
             
             # <--- Build a list of all regions
         
@@ -143,30 +132,33 @@ class plan(webapp.RequestHandler):
                                 
                 for permutationSetIndex, permutationSet in enumerate(permutationSets):
                     
-                    mySet = regions[permutationSetIndex]
-                    conflictCounter = []
-                    for perm in permutationSet:
-                        block = day[mySet[0]][mySet[1]:(mySet[2]+1)]
-                        day[mySet[0]][mySet[1]:(mySet[2]+1)] = perm
+                    for loop in range(5):
+                        mySet = regions[permutationSetIndex]
+                        conflictCounter = []
+                        for perm in permutationSet:
+                            block = day[mySet[0]][mySet[1]:(mySet[2]+1)]
+                            day[mySet[0]][mySet[1]:(mySet[2]+1)] = perm
+                            
+                            conflicts = 0                    
+                            for i, slot in enumerate(day[0]):
+                                conflicts += len(planning.conflictedTeachers(day, i))
+                            conflictCounter.append(conflicts)
                         
-                        conflicts = 0                    
-                        for i, slot in enumerate(day[0]):
-                            conflicts += len(planning.conflictedTeachers(day, i))
-                        conflictCounter.append(conflicts)
-                    
-                    lowestValue = min(conflictCounter)
-                    
-                    bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
-                    bestOption = random.choice(bestOptions)
-                    newList = permutationSet[bestOption]
-                    day[mySet[0]][mySet[1]:mySet[2]+1] = newList
-                    
+                        lowestValue = min(conflictCounter)
+                        
+                        bestOptions = [enum for enum, x in enumerate(conflictCounter) if x == lowestValue]
+                        bestOption = random.choice(bestOptions)
+                        newList = permutationSet[bestOption]
+                        day[mySet[0]][mySet[1]:mySet[2]+1] = newList
+                        
+                        if lowestValue == 0:
+                            break           
                     if lowestValue == 0:
                         break           
                 if lowestValue == 0:
                     print "Woohoo!<br>"
                     break
-            
+            print time.strftime("%H:%M:%S", time.localtime())+": "+str(lowestValue)+"<br>"
         planning.outputHTML()
      
         for dayIndex, day in enumerate(planning.days):
