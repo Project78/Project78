@@ -5,18 +5,28 @@ Created on 26 jan. 2012
 '''
 
 import sys
+import os
 
 sys.path.insert(0, 'reportlab.zip')
+sys.path.insert(0, 'html5lib.zip')
+sys.path.insert(0, 'xhtml2pdf.zip')
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from xhtml2pdf import pisa
 
-class CreatePDF(object):   
+from cStringIO import StringIO
+
+class CreatePDF(object): 
+    def HTML2PDF(self, data, open=False):
+
+        result = StringIO()
+        pdf = pisa.CreatePDF(StringIO(data), result)
+        if open:
+#            print "Content-type: application/pdf"
+            return result.getvalue()
+    
     def createPDF(self, text):
         if not text.strip() == '':
             buf = StringIO()
