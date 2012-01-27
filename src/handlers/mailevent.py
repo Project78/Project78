@@ -10,6 +10,7 @@ from google.appengine.api import users
 from models.guardian import Guardian
 from models.teacher import Teacher
 from classes.CreatePDF import CreatePDF
+from classes.Email import Email
 
 class MailHandler(webapp.RequestHandler):
     title = 'title'
@@ -20,7 +21,7 @@ class MailHandler(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-mail.html')
         self.response.out.write(template.render(path, {}))
         
-    def post(self):        
+    def post(self):   
         if self.request.POST['send-mail']:
             addresses = False
             if self.request.POST['title']:
@@ -52,21 +53,7 @@ class MailHandler(webapp.RequestHandler):
                     for teacher in teachers:
                         addresses.append(teacher.email)
             
-            for to_addr in addresses:
-                to_addr = to_addr.strip()
-                if mail.is_email_valid(to_addr):  
-                    message = mail.EmailMessage()
-                    message.sender = user.email()
-                    message.to = to_addr
-                    message.subject = self.title
-                    message.body = self.text
-                    if not self.attach == '':
-                        pdf = CreatePDF().createPDF(self.attach)
-                        if not pdf == None:
-                            message.attachments = [(self.title + '.pdf', pdf)]
-#                            print pdf
-                    message.Send()
-#                    print 'E-mail sent to %s' % to_addr
+            Email().sendMail(addresses, self.title, self.text, self.attach)
             
             HTMLTEST = """
             <html><body>

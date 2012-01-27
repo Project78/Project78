@@ -17,6 +17,8 @@ from models.guardian import Guardian
 from models.subscriptiondetails import SubscriptionDetails
 from copy import deepcopy
 
+from classes.Email import Email
+
 class AdministrationIndexHandler(webapp.RequestHandler):
 
     def get(self):
@@ -257,9 +259,60 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
-    
     def get(self, arg):
-        return     
+        event = Event.get_by_id(int(arg))
+        days = event.days
+        
+        subscriptions = SubscriptionDetails.all().filter('event', event).fetch(9999)
+        mail = Email()
+        for subscription in subscriptions:
+            guardian = subscription.guardian
+            message = 'Beste ' + guardian.title
+            if not guardian.preposition == '':
+                message += ' ' + guardian.preposition
+            message += ' ' + guardian.lastname + ',\n\nOp'
+            for day_num, day in enumerate(days):
+                message += ' ' + str(day.date.day)
+                if day_num < len(days.fetch(999)) - 1:
+                    message += ','
+            
+            day = days.get()
+            day.updateEndTime()
+            message += ' ' + self.getMonthText(day.date.month) + ' ' + str(day.date.year) + ' zijn er weer mogelijkheden om met de docenten over de voortgang van uw zoon of dochter te praten. De avonden worden gehouden van ' + str(day.date.hour) + ':' + str(day.date.minute)
+            if day.date.minute < 10:
+                message += '0'
+            message += ' tot ' + str(day.end_time.hour) + ':' + str(day.end_time.minute)
+            if day.end_time.minute < 10:
+                message += '0'
+            message += '.\n\n'
+            
+            message += 'Per leerling kunt u tot drie vakken kiezen die u wilt bespreken.\n\n'
+            
+            message += 'Daarnaast kunt u de geplande avonden op volgorde van voorkeur zetten, en aangeven of u liever vroeger of later op de avond ingepland wil worden. Wij doen dan onze uiterste best om de gesprekken voor u zo gunstig mogelijk in te plannen. Houdt u er rekening mee dat in sommige gevallen niet aan alle voorkeuren voldaan zal kunnen worden.\n\n'
+            
+            message += 'U kunt zich inschrijven via http://www.donaldknuthcollege.nl/inschrijven met behulp van de volgende gegevens:\n'
+            message += '- voogdnummer:\t' + str(guardian.key().name()) + '\n'
+            message += '- sleutel:\t' + subscription.passphrase
+            
+            mail.sendMail(guardian.email, 'Uitnodiging ouderavond(en) ' + event.event_name, message)       
+        
+        self.redirect('/administratie')
+    
+    def getMonthText(self, i):
+        return {
+            1: 'januari',
+            2: 'februari',
+            3: 'maart',
+            4: 'april',
+            5: 'mei',
+            6: 'juni',
+            7: 'juli',
+            8: 'augustus',
+            9: 'september',
+            10: 'oktober',
+            11: 'november',
+            12: 'december'
+        }.get(i, '')
     
 class Validator:
     def vDate(self, d):
