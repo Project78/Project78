@@ -187,13 +187,12 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
         code = self.request.POST['search-code']
         method = self.request.POST['search-on']
         
+        appointments = []
         if method == 'guardian':
             guardian = Guardian.get_by_key_name(code)
-            if not guardian:
-                print 'geen guardian met appointment'
-            
-            requests = guardian.all_requests.filter('event', event).fetch(999)
-            appointments = [request.appointment.get() for request in requests]
+            if guardian:
+                requests = guardian.all_requests.filter('event', event).fetch(999)
+                appointments = [request.appointment.get() for request in requests]
             
 #            days = []
 #            for appointment in appointments:
@@ -246,13 +245,14 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
 #                    day_tables_slots.append([day_tables_appointments[0], [table_appointments[0], table_slots]])
         elif method == 'teacher':
             teacher = Teacher.get_by_key_name(code.upper())
-            subjects = teacher.subjects.fetch(999)
-            requests = []
-            for subject in subjects:
-                reqs = subject.requests.fetch(999)
-                for req in reqs:
-                    requests.append(req)
-            appointments = [request.appointment.get() for request in requests]
+            if teacher:
+                subjects = teacher.subjects.fetch(999)
+                requests = []
+                for subject in subjects:
+                    reqs = subject.requests.fetch(999)
+                    for req in reqs:
+                        requests.append(req)
+                appointments = [request.appointment.get() for request in requests]
         notifications = []
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
         template_values = {
