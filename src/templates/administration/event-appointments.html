@@ -31,19 +31,19 @@
 		</form>
 		{% if appointments %}
 		<div id="appointments">
-			<table>
+			<table cellpadding="2px">
 			{% for appointment in appointments %}	
 				{% if appointment %}
 				<!-- day -->
 				<tr>
 					<td>
-						Datum: {{appointment.day.date.year}}-{{appointment.day.date.month}}-{{appointment.day.date.day}}
+						Datum: {{appointment.day.date.year}}-{{appointment.day.date.month}}-{{appointment.day.date.day}} 
 					</td>
 					<td>
-						Tafel: {{appointment.table}}
+						Tafel: {{appointment.table}} 
 					</td>
 					<td>
-						Slot: {{appointment.slot}}
+						Slot: {{appointment.slot}} 
 					</td>
 				</tr>
 				{% endif %}

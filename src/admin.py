@@ -12,10 +12,12 @@ from handlers.administration import AdministrationEventEditHandler
 from handlers.administration import AdministrationGenerateGuardianKeys
 from handlers.administration import AdministrationInviteGuardiansHandler
 from handlers.administration import AdministrationShowAppointmentHandler
+from handlers.administration import AdministrationSendAppointmentsHandler
 
 def main():
     application = webapp.WSGIApplication(
         [('/administratie/event/(\d+)/verstuur-uitnodigingen', AdministrationInviteGuardiansHandler),
+        ('/administratie/event/(\d+)/verstuur-afspraken', AdministrationSendAppointmentsHandler),
         ('/administratie/event/(\d+)/genereer-voogd-sleutels/?', AdministrationGenerateGuardianKeys),
         ('/administratie/event/(\d+)/afspraken/?', AdministrationShowAppointmentHandler),
         ('/administratie/event/(\d+)/genereer-planning/?', plan),

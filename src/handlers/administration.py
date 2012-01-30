@@ -11,6 +11,7 @@ import binascii
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
+from datetime import timedelta
 from models.event import Event
 from models.day import Day
 from models.guardian import Guardian
@@ -220,7 +221,10 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
                 return
             
             requests = guardian.all_requests.filter('event', event).fetch(999)
-            appointments = [request.appointment.get() for request in requests if request.appointment.get()]
+            for request in requests: 
+                if request.appointment.get():
+                    appointments.append(request.appointment.get()) 
+            
             if not appointments:
                 notifications.append("Er zijn geen afspraken gevonden voor de voogd met het voogdnummer " + str(code))
                 path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
@@ -289,6 +293,7 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
                 appointments = [request.appointment.get() for request in requests if request.appointment.get()]
                 if not appointments:
                     notifications.append("Er zijn geen afspraken gevonden voor de docent met docentcode " + str(code))
+                    
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -332,6 +337,7 @@ class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
         
         self.redirect('/administratie')
     
+    @staticmethod
     def getMonthText(self, i):
         return {
             1: 'januari',
@@ -347,6 +353,73 @@ class AdministrationInviteGuardiansHandler(webapp.RequestHandler):
             11: 'november',
             12: 'december'
         }.get(i, '')
+
+class AdministrationSendAppointmentsHandler(webapp.RequestHandler):
+    
+    def get(self, arg):
+        event = Event.get_by_id(int(arg))
+        notifications = []
+        if not event:
+            notifications.append("De bewerking kon niet worden voltooid omdat het event niet bestaat.")
+            events = Event.all()
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-list.html')
+            template_values = {'events': events, 'logoutlink': users.create_logout_url("/") , 'notifications': notifications }
+            self.response.out.write(template.render(path, template_values))
+            return
+        
+        requests = event.requests.fetch(9999)
+        guardians_keys = []
+        
+        for request in requests:
+            if request.guardian.key().name() not in guardians_keys:
+                guardians_keys.append(request.guardian.key().name())
+        
+        if not guardians_keys:
+            notifications.append("Er zijn geen voogden met verzoeken")
+            events = Event.all()
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-list.html')
+            template_values = {'events': events, 'logoutlink': users.create_logout_url("/") , 'notifications': notifications }
+            self.response.out.write(template.render(path, template_values))
+            return
+            
+        for guardian_num, guardian_key in enumerate(guardians_keys):
+            guardian = Guardian.get_by_key_name(guardian_key)
+            guardian_requests = Request.gql("WHERE guardian = :1 AND event = :2", guardian, event).fetch(999)
+            guardian_appointments = [guardian_request.appointment.get() for guardian_request in guardian_requests if guardian_request.appointment.get()]
+            day_ids = [appointment.day.key().id() for appointment in guardian_appointments if appointment]
+            day_ids = list(set(day_ids))
+
+            if not guardian_appointments:
+                continue
+
+            mail = Email()
+            message = 'Beste ' + guardian.title
+            if not guardian.preposition == '':
+                message += ' ' + guardian.preposition
+            message += ' ' + guardian.lastname + ',\n\n'
+            message += 'Er zijn afspraken ingepland voor de ouderavond(en) van het ' + event.event_name + ". "
+            message += 'Hieronder vind u de afspraken die voor u zijn gemaakt:\n\n'
+
+            for day_id in day_ids:
+                day = Day.get_by_id(day_id)
+                message += 'Op ' + str(day.date.day) + ' ' + AdministrationInviteGuardiansHandler.getMonthText(self, day.date.month) + ' '  + str(day.date.year) + ':\n' 
+                for appointment in guardian_appointments:
+                    if appointment.day.key().id() == day_id:
+                        student = appointment.request.student
+                        m = event.talk_time * appointment.slot
+                        d = timedelta(minutes=m)
+                        time = day.date + d
+                        message += 'Tijd: ' + str(time.hour) + ':' + str(time.minute) + '\n'
+                        message += 'Tafel: ' + str(appointment.table) + '\n'
+                        message += 'Leerling: ' + student.firstname + ' ' + student.preposition + ' ' + student.lastname + '\n'
+                        message += 'Vak: ' + appointment.request.combination.subject.name + '\n'
+                        message += 'Docent: ' + appointment.request.combination.teacher.name + '\n'
+                        message += 'Docentcode: ' + appointment.request.combination.teacher.key().name() + '\n\n'
+                    
+#            mail.sendMail(guardian.email, 'Afspraken ouderavond(en) ' + event.event_name, message)
+            if guardian_num == 0:
+                print message
+        return
     
 class Validator:
     def vDate(self, d):
