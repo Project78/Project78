@@ -168,31 +168,64 @@ class AdministrationGenerateGuardianKeys(webapp.RequestHandler):
 class AdministrationShowAppointmentHandler(webapp.RequestHandler):
     
     def get(self, arg):
+        event = Event.get_by_id(int(arg))
         notifications = []
+        if not event:
+            notifications.append("Er is geen ouderavondreeks gevonden met het nummer " + str(arg))
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
         template_values = {
+            'event': event,
             'notifications': notifications, 
-            'logoutlink': users.create_logout_url("/") 
+            'logoutlink': users.create_logout_url("/")
         }
         self.response.out.write(template.render(path, template_values))
         return
     
     def post(self, arg):
         event = Event.get_by_id(int(arg))
-        if not event:
-            #todo
-            '''event bestaat niet'''
+        notifications = []
+        appointments = []
+        
+        template_values = {
+            'event': event,
+            'appointments': appointments,
+            'notifications': notifications, 
+            'logoutlink': users.create_logout_url("/") 
+        }
+        
+        if not event: 
+            notifications.append("Er is geen ouderavondreeks gevonden met het nummer " + str(arg))
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+            self.response.out.write(template.render(path, template_values))
             return
         
         code = self.request.POST['search-code']
         method = self.request.POST['search-on']
         
-        appointments = []
+        if not code:
+            notifications.append("Er dient een docentcode of voogdnummer ingevoerd te worden.")
+        if not method:
+            notifications.append("Er dient aangegeven te worden of er op docent of voogd gezocht wordt.")
+        if not (code and method):
+            path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+            self.response.out.write(template.render(path, template_values))
+            return
+        
         if method == 'guardian':
             guardian = Guardian.get_by_key_name(code)
-            if guardian:
-                requests = guardian.all_requests.filter('event', event).fetch(999)
-                appointments = [request.appointment.get() for request in requests]
+            if not guardian:
+                notifications.append("Er is geen voogd gevonden met het voogdnummer " + str(code))
+                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+                self.response.out.write(template.render(path, template_values))
+                return
+            
+            requests = guardian.all_requests.filter('event', event).fetch(999)
+            appointments = [request.appointment.get() for request in requests if request.appointment.get()]
+            if not appointments:
+                notifications.append("Er zijn geen afspraken gevonden voor de voogd met het voogdnummer " + str(code))
+                path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
+                self.response.out.write(template.render(path, template_values))
+                return
             
 #            days = []
 #            for appointment in appointments:
@@ -231,7 +264,6 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
 #                
 #            day_tables_slots = []
 #            for day_tables_appointments in days_tables_appointments:
-#                
 #                for table_appointments in day_tables_appointments[1]:
 #                    table_slots = []
 #                    for slot in range(1, day_tables_appointments[0].talks+1):
@@ -245,6 +277,8 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
 #                    day_tables_slots.append([day_tables_appointments[0], [table_appointments[0], table_slots]])
         elif method == 'teacher':
             teacher = Teacher.get_by_key_name(code.upper())
+            if not teacher:
+                notifications.append('Er is geen docent gevonden met de opgegeven docentcode.')
             if teacher:
                 subjects = teacher.subjects.fetch(999)
                 requests = []
@@ -252,14 +286,10 @@ class AdministrationShowAppointmentHandler(webapp.RequestHandler):
                     reqs = subject.requests.fetch(999)
                     for req in reqs:
                         requests.append(req)
-                appointments = [request.appointment.get() for request in requests]
-        notifications = []
+                appointments = [request.appointment.get() for request in requests if request.appointment.get()]
+                if not appointments:
+                    notifications.append("Er zijn geen afspraken gevonden voor de docent met docentcode " + str(code))
         path = os.path.join(os.path.dirname(__file__), '../templates/administration/event-appointments.html')
-        template_values = {
-            'appointments': appointments,
-            'notifications': notifications, 
-            'logoutlink': users.create_logout_url("/") 
-        }
         self.response.out.write(template.render(path, template_values))
 
 class AdministrationInviteGuardiansHandler(webapp.RequestHandler):

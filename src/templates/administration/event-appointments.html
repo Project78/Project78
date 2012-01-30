@@ -5,8 +5,8 @@
 {% endblock %}
 {% block content %}
 	<div id="content" class="clearfix">
-		<div class="breadcrumb"><a href="/">Home</a> / <a href="/administratie">Overzicht ouderavondreeksen</a></div>
-		<h1>Overzicht ouderavondreeksen</h1>
+		<div class="breadcrumb"><a href="/">Home</a> / <a href="/administratie">Overzicht ouderavondreeksen</a> / <a href="/administratie/event/{{event.key.id}}/afspraken">Afspraken ouderavondreeks {{ event.event_name }}</a></div>
+		<h1>Afspraken ouderavondreeks {{ event.event_name }}</h1>
 		{% if notifications %}
 		<div id="notifications">
 			<h2>Meldingen</h2>
@@ -20,7 +20,7 @@
 		<form method="post" action="">
 			<div class="label-pair clearfix">
 				<label>Zoek op:</label>
-				<input type="radio" value="guardian" name="search-on"/> Voogd<br />
+				<input type="radio" value="guardian" name="search-on" checked="checked" /> Voogd<br />
 				<label>&nbsp;</label>
 				<input type="radio" value="teacher" name="search-on"/> Docent<br />
 			</div>
