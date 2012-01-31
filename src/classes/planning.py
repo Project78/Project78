@@ -6,6 +6,7 @@ Created on Nov 27, 2011
 
 import random
 import itertools
+import logging
 
 for n,m in ( ('reverse(o)','n.reverse()'),('sort(o)','n.sort()'),\
                 ('extend(o,o1)','n.extend(o1)')): exec "def %s:\n t=type\n to=t(o)\
@@ -117,8 +118,12 @@ class Planning(object):
         uniqueTeachers = set([table.combination.teacher.key().name() for table in slot])
         countAppointments = [teachersInSlot.count(teacher) for teacher in uniqueTeachers]
         conflicted = []
-        for i, teacher in enumerate(uniqueTeachers):
-            if countAppointments[i] > 1:
+#        for i, teacher in enumerate(uniqueTeachers):
+#            if countAppointments[i] > 1:
+#                conflicted.append(teacher)
+
+        for teacher in teachersInSlot:
+            if teachersInSlot.count(teacher) > 1:
                 conflicted.append(teacher)
 
 #        print "conflictedTeachers called for slot "+str(slotnumber)
@@ -129,6 +134,15 @@ class Planning(object):
 
         
         return conflicted
+    
+    def numberOfConflictsPerRegion(self, day, region):
+        allConflictedTeachers = []
+        myTeachers = [self.getTeacherStringFromRequest(day[region[0]][slotnumber]) for slotnumber in range(region[1],region[2]+1)]
+        for slotnumber in range(region[1],region[2]+1):
+            allConflictedTeachers += self.conflictedTeachers(day, slotnumber)
+        conflictedTeachers = [teacher for teacher in myTeachers if teacher in allConflictedTeachers]    
+        conflicts = len(conflictedTeachers)
+        return conflicts
     
     def flipped(self, day):
         return zip(*day)
